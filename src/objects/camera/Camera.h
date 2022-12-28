@@ -5,11 +5,12 @@
 #ifndef OPENGLPROJECT_CAMERA_H
 #define OPENGLPROJECT_CAMERA_H
 
-
+#include "glm/ext/matrix_transform.hpp"
+#include "glm/ext/matrix_clip_space.hpp"
 #include "../transform/Transform.h"
 
+
 class Camera {
-    float zoom = 1.0f;
 public:
     explicit Camera(Transform &transform);
 
@@ -19,6 +20,7 @@ public:
 
     glm::mat4 getProjectionMatrix();
 
+    static float zoom;
 };
 
 

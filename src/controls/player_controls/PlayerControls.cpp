@@ -7,7 +7,7 @@
 PlayerControls::PlayerControls(Transform &transform, Camera &camera, World &world)
         : transform(transform), camera(camera), world(world) {}
 
-void PlayerControls::processControls(GLFWwindow *window) {
+void PlayerControls::processEvents(GLFWwindow *window) {
     glm::vec3 oldPosition = this->transform.position;
 
     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {

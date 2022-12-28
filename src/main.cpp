@@ -22,6 +22,7 @@
 #include "controls/player_controls/PlayerControls.h"
 #include "utils/world/generate_world.h"
 #include "texture/manager/TextureManager.h"
+#include "controls/camera/CameraControls.h"
 
 #define SHADER_PATH "shaders/"
 
@@ -227,6 +228,7 @@ int main(int argc, char *argv[]) {
     world.instantiateObjects(shader, "resources/objects/cube.obj");
 
     PlayerControls controls = PlayerControls(player->transform, camera, world);
+    CameraControls cameraControls = CameraControls(camera, window);
     //2. Use the shader Class to send the uniform
     glm::mat4 model = glm::mat4(1.0);
     model = glm::translate(model, glm::vec3(1.0, 1.0, 2.0));
@@ -234,7 +236,8 @@ int main(int argc, char *argv[]) {
     light.use(camera, model);
 
     while (!glfwWindowShouldClose(window)) {
-        controls.processControls(window);
+        controls.processEvents(window);
+
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
         glViewport(0, 0, width, height);
