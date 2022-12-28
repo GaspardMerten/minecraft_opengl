@@ -43,7 +43,7 @@ void Cubemap::makeObject() {
 
     //stbi_set_flip_vertically_on_load(true);
 
-    std::string pathToCubeMap = R"(resources\yokohama3\)";
+    std::string pathToCubeMap = R"(resources/yokohama3/)";
 
     std::map<std::string, GLenum> facesToLoad = {
             {pathToCubeMap + "posx.jpg",GL_TEXTURE_CUBE_MAP_POSITIVE_X},

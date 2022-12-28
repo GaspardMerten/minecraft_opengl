@@ -215,14 +215,14 @@ int main(int argc, char *argv[]) {
     }
     else
     {
-        std::cout << "Failed to load texture" << std::endl;
+        std::cout << "Failed to load texture block" << std::endl;
     }
     auto *cube = new GameObject("resources/objects/cube.obj", shader);
     cube->makeObject();
 
     glfwSwapInterval(1);
 
-    // previous mouse position
+    // previous mouse positionx
     double prevX = 0;
     double prevY = 0;
 
