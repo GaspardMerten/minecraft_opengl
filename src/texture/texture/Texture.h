@@ -5,7 +5,7 @@
 #ifndef OPENGLPROJECT_TEXTURE_H
 #define OPENGLPROJECT_TEXTURE_H
 
-#include <glad/glad.h>
+#include "glad/glad.h"
 #include <string>
 
 class Texture {

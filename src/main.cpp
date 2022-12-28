@@ -21,6 +21,7 @@
 #include "objects/camera/Camera.h"
 #include "controls/player_controls/PlayerControls.h"
 #include "utils/world/generate_world.h"
+#include "texture/manager/TextureManager.h"
 
 #define SHADER_PATH "shaders/"
 
@@ -168,8 +169,8 @@ int main(int argc, char *argv[]) {
     double prev = 0;
     int deltaFrame = 0;
 
-    Texture* dirtTexture = new Texture("resources/textures/block.jpg");
-    Texture* steveTexture = new Texture("resources/textures/steve.png");
+    TextureManager::linkTexture(TextureType::DIRT,  "resources/textures/dirt.jpg");
+    TextureManager::linkTexture(TextureType::PLAYER, "resources/textures/negy.jpg");
 
     Shader cubemapShader = loadShader("cubemap_vert.glsl", "cubemap_frag.glsl");
     cubemapShader.use();
@@ -181,7 +182,7 @@ int main(int argc, char *argv[]) {
 
     auto *player = new GameObject("resources/objects/stevy.obj", shader);
     player->makeObject();
-    player->setTextureID(steveTexture->getID());
+    player->setTextureID(TextureManager::getTextureID(TextureType::PLAYER));
 
     Camera camera = Camera(player->transform);
 
@@ -193,7 +194,7 @@ int main(int argc, char *argv[]) {
 
     auto *cube = new GameObject("resources/objects/cube.obj", shader);
     cube->makeObject();
-    cube->setTextureID(dirtTexture->getID());
+    cube->setTextureID(TextureManager::getTextureID(TextureType::DIRT));
 
     glfwSwapInterval(1);
 
