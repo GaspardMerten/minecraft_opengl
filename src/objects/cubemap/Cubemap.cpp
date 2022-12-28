@@ -4,6 +4,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include "../camera.h"
+#include "../camera/Camera.h"
 
 #include <map>
 
@@ -43,7 +44,7 @@ void Cubemap::makeObject() {
 
     //stbi_set_flip_vertically_on_load(true);
 
-    std::string pathToCubeMap = "/Users/jonathanstefanov/Documents/Unif/MA1/VR/minecraft/src/objects/cubemap/yokohama3/";
+    std::string pathToCubeMap = "resources/objects/yokohama3/";
 
     std::map<std::string, GLenum> facesToLoad = {
             {pathToCubeMap + "posx.jpg",GL_TEXTURE_CUBE_MAP_POSITIVE_X},
@@ -62,8 +63,8 @@ void Cubemap::makeObject() {
 
 void Cubemap::draw(Camera &camera) {
     shader.use();
-    shader.setMatrix4("V", camera.GetViewMatrix());
-    shader.setMatrix4("P", camera.GetProjectionMatrix());
+    shader.setMatrix4("V", camera.getViewMatrix());
+    shader.setMatrix4("P", camera.getProjectionMatrix());
     shader.setInteger("cubemapTexture", 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP,cubeMapTexture);

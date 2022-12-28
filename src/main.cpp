@@ -19,6 +19,9 @@
 #include "objects/camera.h"
 #include "utils/shader/shader/Light.h"
 #include "objects/cubemap/Cubemap.h"
+#include "objects/camera/Camera.h"
+#include "controls/player_controls/PlayerControls.h"
+#include "utils/world/generate_world.h"
 
 #define SHADER_PATH "shaders/"
 
@@ -119,7 +122,6 @@ void APIENTRY glDebugOutput(GLenum source,
 
 #endif
 
-Camera camera(glm::vec3(1.0, 0.0, -6.0),glm::vec3(0.0,1.0,0.0), 90.0);
 
 int main(int argc, char *argv[]) {
     if (!glfwInit()) {
@@ -168,14 +170,19 @@ int main(int argc, char *argv[]) {
     int deltaFrame = 0;
 
 
-    glm::mat4 view = camera.GetViewMatrix();
-    glm::mat4 perspective = camera.GetProjectionMatrix();
-
     Shader cubemapShader = loadShader("cubemap_vert.glsl","cubemap_frag.glsl");
     auto *cubemap = new Cubemap("resources/objects/cube.obj", cubemapShader);
 
     Shader shader = loadShader("vertex.glsl", "fragment.glsl");
     shader.use();
+
+    auto *player = new GameObject("resources/objects/cube.obj", shader);
+
+    Camera camera = Camera(player->transform);
+
+    glm::mat4 view = camera.getViewMatrix();
+    glm::mat4 perspective = camera.getProjectionMatrix();
+
 
     // Adding texture to cube
     GLuint texture;
@@ -234,13 +241,16 @@ int main(int argc, char *argv[]) {
     );
     light.init();
 
+    World world = generateFlatWorld(30, 30, 1);
+    PlayerControls controls = PlayerControls(player->transform, camera, world);
 
     while (!glfwWindowShouldClose(window)) {
+        controls.processControls(window);
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
         glViewport(0, 0, width, height);
 
-        view = camera.GetViewMatrix();
+        view = camera.getViewMatrix();
         glfwPollEvents();
         double now = glfwGetTime();
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
@@ -270,7 +280,6 @@ int main(int argc, char *argv[]) {
 
 
         // compute new orientation
-        camera.ProcessMouseMovement(xpos - prevX, prevY - ypos, height, width);
         prevX = xpos;
         prevY = ypos;
 

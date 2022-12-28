@@ -8,7 +8,7 @@
 
 #include "../../utils/shader/shader/Shader.h"
 #include "../game_object/GameObject.h"
-#include "../camera.h"
+#include "../camera/camera.h"
 
 class Cubemap : public GameObject {
 private:
@@ -22,7 +22,6 @@ public:
     void draw(Camera &camera);
 
     Cubemap(const std::string &pathToMesh, Shader &shader);
-
 };
 
 
