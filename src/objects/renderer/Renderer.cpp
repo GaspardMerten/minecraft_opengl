@@ -6,8 +6,8 @@
 
 void Renderer::draw(Shader& Shader, Transform &transform, Mesh &mesh, GLuint textureID) const {
     // print texture
-    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textureID);
+    glActiveTexture(GL_TEXTURE0);
 
     Shader.setMatrix4("M", transform.getModel());
     glBindVertexArray(this->VAO);

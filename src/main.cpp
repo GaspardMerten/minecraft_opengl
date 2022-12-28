@@ -170,7 +170,7 @@ int main(int argc, char *argv[]) {
     int deltaFrame = 0;
 
     TextureManager::linkTexture(TextureType::DIRT,  "resources/textures/dirt.jpg");
-    TextureManager::linkTexture(TextureType::PLAYER, "resources/textures/negy.jpg");
+    TextureManager::linkTexture(TextureType::PLAYER, "resources/textures/steve.jpg");
 
     Shader cubemapShader = loadShader("cubemap_vert.glsl", "cubemap_frag.glsl");
     cubemapShader.use();
@@ -181,8 +181,11 @@ int main(int argc, char *argv[]) {
     shader.use();
 
     auto *player = new GameObject("resources/objects/stevy.obj", shader);
+    auto *player2 = new GameObject("resources/objects/stevy.obj", shader);
     player->makeObject();
+    player2->makeObject();
     player->setTextureID(TextureManager::getTextureID(TextureType::PLAYER));
+    player2->setTextureID(TextureManager::getTextureID(TextureType::PLAYER));
 
     Camera camera = Camera(player->transform);
 
@@ -190,6 +193,8 @@ int main(int argc, char *argv[]) {
     glm::mat4 perspective = camera.getProjectionMatrix();
 
     player->transform.position = glm::vec3(10, 1, 10);
+    player2->transform.position = glm::vec3(20, 1, 20);
+    player2->transform.setRotationY(90);
     // Adding texture to cube
 
     auto *cube = new GameObject("resources/objects/cube.obj", shader);
@@ -252,6 +257,7 @@ int main(int argc, char *argv[]) {
         cube->draw();
         world.draw();
         player->draw();
+        player2->draw();
 
 
         // get current mouse position

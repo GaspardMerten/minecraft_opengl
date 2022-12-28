@@ -9,6 +9,7 @@
 #include <iostream>
 
 Texture::Texture(std::string path) {
+    stbi_set_flip_vertically_on_load(true);
     glGenTextures(1, &textureID);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textureID);
