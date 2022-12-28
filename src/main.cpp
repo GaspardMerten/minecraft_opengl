@@ -177,7 +177,7 @@ int main(int argc, char *argv[]) {
     Shader shader = loadShader("vertex.glsl", "fragment.glsl");
     shader.use();
 
-    auto *player = new GameObject("resources/objects/cube.obj", shader);
+    auto *player = new GameObject("resources/objects/stevy.obj", shader);
     player->makeObject();
     Camera camera = Camera(player->transform);
 
@@ -265,13 +265,12 @@ int main(int argc, char *argv[]) {
 
 
         shader.use();
-
         shader.setMatrix4("V", view);
         shader.setMatrix4("P", perspective);
 
         cube->draw();
-        player->draw();
         world.draw();
+        player->draw();
 
 
         // get current mouse position
