@@ -20,6 +20,9 @@ GLuint loadShaderFromFile(std::string filePath, GLenum shaderType) {
                         (std::istreambuf_iterator<char>()));
 
 
+    // print file content
+    //std::cout << content << std::endl;
+
     GLuint shader = glCreateShader(shaderType);
     GLint  success;
     const char *shaderSource = content.c_str();

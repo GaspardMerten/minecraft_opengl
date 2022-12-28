@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 #include<glm/gtc/matrix_transform.hpp>
 #include<glm/gtc/type_ptr.hpp>
+#include "stb_image.h"
 
 #include <chrono>
 #include <thread>
@@ -16,10 +17,8 @@
 #include "utils/shader/shader/Shader.h"
 #include "objects/game_object/GameObject.h"
 #include "objects/camera.h"
-#include "objects/camera/Camera.h"
-#include "utils/world/generate_world.h"
-#include "world/World.h"
-#include "controls/player_controls/PlayerControls.h"
+#include "utils/shader/shader/Light.h"
+#include "objects/cubemap/Cubemap.h"
 
 #define SHADER_PATH "shaders/"
 
@@ -120,6 +119,7 @@ void APIENTRY glDebugOutput(GLenum source,
 
 #endif
 
+Camera camera(glm::vec3(1.0, 0.0, -6.0),glm::vec3(0.0,1.0,0.0), 90.0);
 
 int main(int argc, char *argv[]) {
     if (!glfwInit()) {
@@ -159,8 +159,6 @@ int main(int argc, char *argv[]) {
         glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
     }
 #endif
-    Shader Shader = loadShader("vertex.glsl", "fragment.glsl");
-    Shader.use();
 
 
     const glm::vec3 light_pos = glm::vec3(0.5, 0.5, -0.7);
@@ -170,14 +168,49 @@ int main(int argc, char *argv[]) {
     int deltaFrame = 0;
 
 
-    auto *cube = new GameObject("resources/objects/bunny_small.obj", Shader);
-    auto *cube2 = new GameObject("resources/objects/cube.obj", Shader);
+    glm::mat4 view = camera.GetViewMatrix();
+    glm::mat4 perspective = camera.GetProjectionMatrix();
 
-    cube->transform.setPosition(0,3, 0);
-    Camera camera = Camera(cube->transform);
+    Shader cubemapShader = loadShader("cubemap_vert.glsl","cubemap_frag.glsl");
+    auto *cubemap = new Cubemap("resources/objects/cube.obj", cubemapShader);
 
-    glm::mat4 view = camera.getViewMatrix();
-    glm::mat4 perspective = camera.getProjectionMatrix();
+    Shader shader = loadShader("vertex.glsl", "fragment.glsl");
+    shader.use();
+
+    // Adding texture to cube
+    GLuint texture;
+
+    glGenTextures(1, &texture);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    // Define the parameters for the texture
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // Load the image
+
+    //Carefull depending on where your executable is, the relative path might be different from what you think it is
+    //Try to use an absolute path
+    //image usually have thei 0.0 at the top of the vertical axis and not the bottom like opengl expects
+    //stbi_set_flip_vertically_on_load(true);
+    int width, height, imNrChannels;
+    char file[128] = "/Users/jonathanstefanov/Documents/Unif/MA1/VR/minecraft/resources/textures/block.jpg";
+    unsigned char* data = stbi_load(file, &width, &height, &imNrChannels, 0);
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    auto *cube = new GameObject("resources/objects/cube.obj", shader);
+
+    cubemap->makeObject();
 
     glfwSwapInterval(1);
 
@@ -186,40 +219,61 @@ int main(int argc, char *argv[]) {
     double prevY = 0;
 
     glfwGetCursorPos(window, &prevX, &prevY);
-    World world = generateFlatWorld(100, 100, 2);
-    world.instantiateObjects(Shader, "resources/objects/cube.obj");
 
-    PlayerControls* controls = new PlayerControls(cube->transform, camera, world);
+    Light light(
+            shader,
+            glm::vec3(4.0, 4.0, 4.0),
+            glm::vec3(0.0, 0.0, 0.0),
+            0.1,
+            0.8,
+            0.5,
+            32.0,
+            0.14,
+            0.01,
+            1.0
+    );
+    light.init();
+
 
     while (!glfwWindowShouldClose(window)) {
-        controls->processControls(window);
-
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
         glViewport(0, 0, width, height);
 
-        view = camera.getViewMatrix();
+        view = camera.GetViewMatrix();
         glfwPollEvents();
         double now = glfwGetTime();
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-
         //2. Use the shader Class to send the uniform
-        Shader.use();
+        glm::mat4 model = glm::mat4(1.0);
+        model = glm::translate(model, glm::vec3(1.0, 1.0, 2.0));
+        model = glm::scale(model, glm::vec3(1.2, 1.2, 1.2));
 
-        Shader.setMatrix4("V", view);
-        Shader.setMatrix4("P", perspective);
+        light.use(camera, model);
 
-        world.draw();
+        cubemapShader.use();
+        cubemap->draw(camera);
+
+        shader.use();
+        shader.setMatrix4("V", view);
+        shader.setMatrix4("P", perspective);
+        cube->draw();
+
+
+
         // get current mouse position
         double xpos, ypos;
 
-        cube->draw();
-        // if the left button is pressed
-
         glfwGetCursorPos(window, &xpos, &ypos);
+
+
+        // compute new orientation
+        camera.ProcessMouseMovement(xpos - prevX, prevY - ypos, height, width);
+        prevX = xpos;
+        prevY = ypos;
+
         glfwSwapBuffers(window);
     }
 

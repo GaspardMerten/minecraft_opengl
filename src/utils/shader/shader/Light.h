@@ -7,6 +7,7 @@
 
 
 #include "Shader.h"
+#include "../../../objects/camera.h"
 
 class Light {
 public:
@@ -22,10 +23,10 @@ public:
     float quadratic;
     float constant;
 
-    Light(Shader* shader, glm::vec3 position, glm::vec3 materialColor, float ambientStrength, float specularStrength, float diffuseStrength, float shininess, float linear, float quadratic, float constant);
+    Light(Shader shader, glm::vec3 position, glm::vec3 materialColor, float ambientStrength, float specularStrength, float diffuseStrength, float shininess, float linear, float quadratic, float constant);
 
     void init();
-    void use();
+    void use(Camera camera, glm::mat4 model);
 
 };
 
