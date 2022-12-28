@@ -27,12 +27,9 @@ void Renderer::makeObject(Shader& shader, Mesh &mesh, Transform &transform) {
     glVertexAttribPointer(att_pos, 3, GL_FLOAT, false, 8 * sizeof(float), (void *) 0);
 
 
-    if (false) {
-        auto att_tex = glGetAttribLocation(shader.ID, "tex_coord");
-        glEnableVertexAttribArray(att_tex);
-        glVertexAttribPointer(att_tex, 2, GL_FLOAT, false, 8 * sizeof(float), (void *) (3 * sizeof(float)));
-
-    }
+    auto att_tex = glGetAttribLocation(shader.ID, "tex_coord");
+    glEnableVertexAttribArray(att_tex);
+    glVertexAttribPointer(att_tex, 2, GL_FLOAT, false, 8 * sizeof(float), (void *) (3 * sizeof(float)));
 
     auto att_col = glGetAttribLocation(shader.ID, "normal");
     glEnableVertexAttribArray(att_col);

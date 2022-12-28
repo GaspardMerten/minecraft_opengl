@@ -10,20 +10,20 @@
 #include "../mesh/Mesh.h"
 #include "../renderer/Renderer.h"
 
-class GameObject{
+class GameObject {
 public:
     GameObject(const std::string &pathToMesh, Shader &shader);
 
     int loadMesh(const std::string& path);
 
-    void draw();
+    virtual void draw();
 
-    void makeObject();
+    virtual void makeObject();
 
     Mesh mesh;
     Renderer renderer;
-    Transform transform;
     Shader& shader;
+    Transform transform;
 };
 
 

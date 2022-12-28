@@ -3,9 +3,10 @@
 //
 
 #include "Light.h"
+#include "../../../objects/camera.h"
 
-Light::Light(Shader* shader, glm::vec3 position, glm::vec3 materialColor, float ambientStrength, float specularStrength,
-             float diffuseStrength, float shininess, float linear, float quadratic, float constant) : shader(*shader) {
+Light::Light(Shader shader, glm::vec3 position, glm::vec3 materialColor, float ambientStrength, float specularStrength,
+             float diffuseStrength, float shininess, float linear, float quadratic, float constant) : shader(shader) {
     this->position = position;
     this->materialColor = materialColor;
     this->ambientStrength = ambientStrength;
@@ -19,16 +20,20 @@ Light::Light(Shader* shader, glm::vec3 position, glm::vec3 materialColor, float 
 
 void Light::init() {
     shader.setFloat("shininess", shininess);
-    shader.setVector3f("materialColour", this->materialColor);
-    shader.setFloat("light.ambient_strength", this->ambientStrength);
-    shader.setFloat("light.diffuse_strength", this->diffuseStrength);
-    shader.setFloat("light.specular_strength", this->specularStrength);
+    shader.setVector3f("materialColour", materialColor);
+    shader.setFloat("light.ambient_strength", ambientStrength);
+    shader.setFloat("light.diffuse_strength", diffuseStrength);
+    shader.setFloat("light.specular_strength", specularStrength);
     shader.setFloat("light.constant", constant);
     shader.setFloat("light.linear", linear);
     shader.setFloat("light.quadratic", quadratic);
 }
 
-void Light::use() {
+void Light::use(Camera camera, glm::mat4 model) {
+    glm::mat4 inverseModel = glm::transpose( glm::inverse(model));
+
+    shader.setMatrix4("itM", inverseModel);
+
     shader.setVector3f("u_view_pos", camera.Position);
 
 }

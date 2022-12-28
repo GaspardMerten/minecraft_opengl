@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 #include<glm/gtc/matrix_transform.hpp>
 #include<glm/gtc/type_ptr.hpp>
+#include "stb_image.h"
 
 #include <chrono>
 #include <thread>
@@ -16,6 +17,8 @@
 #include "utils/shader/shader/Shader.h"
 #include "objects/game_object/GameObject.h"
 #include "objects/camera.h"
+#include "utils/shader/shader/Light.h"
+#include "objects/cubemap/Cubemap.h"
 
 #define SHADER_PATH "shaders/"
 
@@ -156,8 +159,6 @@ int main(int argc, char *argv[]) {
         glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
     }
 #endif
-    Shader Shader = loadShader("vertex.glsl", "fragment.glsl");
-    Shader.use();
 
 
     const glm::vec3 light_pos = glm::vec3(0.5, 0.5, -0.7);
@@ -170,10 +171,46 @@ int main(int argc, char *argv[]) {
     glm::mat4 view = camera.GetViewMatrix();
     glm::mat4 perspective = camera.GetProjectionMatrix();
 
+    Shader cubemapShader = loadShader("cubemap_vert.glsl","cubemap_frag.glsl");
+    auto *cubemap = new Cubemap("resources/objects/cube.obj", cubemapShader);
 
-    auto *cube = new GameObject("resources/objects/bunny_small.obj", Shader);
+    Shader shader = loadShader("vertex.glsl", "fragment.glsl");
+    shader.use();
 
+    // Adding texture to cube
+    GLuint texture;
 
+    glGenTextures(1, &texture);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    // Define the parameters for the texture
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // Load the image
+
+    //Carefull depending on where your executable is, the relative path might be different from what you think it is
+    //Try to use an absolute path
+    //image usually have thei 0.0 at the top of the vertical axis and not the bottom like opengl expects
+    //stbi_set_flip_vertically_on_load(true);
+    int width, height, imNrChannels;
+    char file[128] = "/Users/jonathanstefanov/Documents/Unif/MA1/VR/minecraft/resources/textures/block.jpg";
+    unsigned char* data = stbi_load(file, &width, &height, &imNrChannels, 0);
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    auto *cube = new GameObject("resources/objects/cube.obj", shader);
+
+    cubemap->makeObject();
 
     glfwSwapInterval(1);
 
@@ -182,6 +219,20 @@ int main(int argc, char *argv[]) {
     double prevY = 0;
 
     glfwGetCursorPos(window, &prevX, &prevY);
+
+    Light light(
+            shader,
+            glm::vec3(4.0, 4.0, 4.0),
+            glm::vec3(0.0, 0.0, 0.0),
+            0.1,
+            0.8,
+            0.5,
+            32.0,
+            0.14,
+            0.01,
+            1.0
+            );
+    light.init();
 
 
     while (!glfwWindowShouldClose(window)) {
@@ -196,11 +247,18 @@ int main(int argc, char *argv[]) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         //2. Use the shader Class to send the uniform
-        Shader.use();
+        glm::mat4 model = glm::mat4(1.0);
+        model = glm::translate(model, glm::vec3(1.0, 1.0, 2.0));
+        model = glm::scale(model, glm::vec3(1.2, 1.2, 1.2));
 
-        Shader.setMatrix4("V", view);
-        Shader.setMatrix4("P", perspective);
+        light.use(camera, model);
 
+        cubemapShader.use();
+        cubemap->draw(camera);
+
+        shader.use();
+        shader.setMatrix4("V", view);
+        shader.setMatrix4("P", perspective);
         cube->draw();
 
 
