@@ -14,6 +14,7 @@ void World::instantiateObjects(Shader &baseShader, const std::string& blockMesh)
     Mesh mesh = Mesh(blockMesh);
     for (auto &worldBlock : worldBlocks) {
         worldBlockInstances[worldBlock.first] = new GameObject(mesh, baseShader);
+        worldBlockInstances[worldBlock.first]->makeObject();
         worldBlockInstances[worldBlock.first]->transform.setPosition(std::get<0>(worldBlock.first), std::get<2>(worldBlock.first), std::get<1>(worldBlock.first));
     }
 }

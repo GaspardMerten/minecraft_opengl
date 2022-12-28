@@ -14,7 +14,6 @@ void Cubemap::loadCubemapFace(const char * path, const GLenum& targetFace)
     unsigned char* data = stbi_load(path, &imWidth, &imHeight, &imNrChannels, 0);
     if (data)
     {
-
         glTexImage2D(targetFace, 0, GL_RGB, imWidth, imHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
         //glGenerateMipmap(targetFace);
     }
@@ -44,7 +43,7 @@ void Cubemap::makeObject() {
 
     //stbi_set_flip_vertically_on_load(true);
 
-    std::string pathToCubeMap = "resources/objects/yokohama3/";
+    std::string pathToCubeMap = R"(resources\yokohama3\)";
 
     std::map<std::string, GLenum> facesToLoad = {
             {pathToCubeMap + "posx.jpg",GL_TEXTURE_CUBE_MAP_POSITIVE_X},
@@ -73,6 +72,6 @@ void Cubemap::draw(Camera &camera) {
 
 }
 
-Cubemap::Cubemap(const std::string &pathToMesh, Shader &shader) : GameObject(pathToMesh, shader) {
+Cubemap::   Cubemap(const std::string &pathToMesh, Shader &shader) : GameObject(pathToMesh, shader) {
 
 }

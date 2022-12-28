@@ -171,13 +171,15 @@ int main(int argc, char *argv[]) {
 
 
     Shader cubemapShader = loadShader("cubemap_vert.glsl","cubemap_frag.glsl");
+    cubemapShader.use();
     auto *cubemap = new Cubemap("resources/objects/cube.obj", cubemapShader);
+    cubemap->makeObject();
 
     Shader shader = loadShader("vertex.glsl", "fragment.glsl");
     shader.use();
 
     auto *player = new GameObject("resources/objects/cube.obj", shader);
-
+    player->makeObject();
     Camera camera = Camera(player->transform);
 
     glm::mat4 view = camera.getViewMatrix();
@@ -204,7 +206,7 @@ int main(int argc, char *argv[]) {
     //image usually have thei 0.0 at the top of the vertical axis and not the bottom like opengl expects
     //stbi_set_flip_vertically_on_load(true);
     int width, height, imNrChannels;
-    char file[128] = "/Users/jonathanstefanov/Documents/Unif/MA1/VR/minecraft/resources/textures/block.jpg";
+    char file[128] = "resources/textures/block.jpg";
     unsigned char* data = stbi_load(file, &width, &height, &imNrChannels, 0);
     if (data)
     {
@@ -216,8 +218,7 @@ int main(int argc, char *argv[]) {
         std::cout << "Failed to load texture" << std::endl;
     }
     auto *cube = new GameObject("resources/objects/cube.obj", shader);
-
-    cubemap->makeObject();
+    cube->makeObject();
 
     glfwSwapInterval(1);
 
@@ -241,7 +242,9 @@ int main(int argc, char *argv[]) {
     );
     light.init();
 
-    World world = generateFlatWorld(30, 30, 1);
+    World world = generateFlatWorld(30, 30, 5);
+    world.instantiateObjects(shader, "resources/object/cube.obj");
+
     PlayerControls controls = PlayerControls(player->transform, camera, world);
 
     while (!glfwWindowShouldClose(window)) {
@@ -256,20 +259,25 @@ int main(int argc, char *argv[]) {
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        cubemapShader.use();
+
+        shader.use();
+
+
         //2. Use the shader Class to send the uniform
         glm::mat4 model = glm::mat4(1.0);
         model = glm::translate(model, glm::vec3(1.0, 1.0, 2.0));
         model = glm::scale(model, glm::vec3(1.2, 1.2, 1.2));
-
         light.use(camera, model);
 
-        cubemapShader.use();
-        cubemap->draw(camera);
-
-        shader.use();
         shader.setMatrix4("V", view);
         shader.setMatrix4("P", perspective);
+
+        world.draw();
+
         cube->draw();
+
+        player->draw();
 
 
 
@@ -284,6 +292,7 @@ int main(int argc, char *argv[]) {
         prevY = ypos;
 
         glfwSwapBuffers(window);
+
     }
 
     //clean up ressource

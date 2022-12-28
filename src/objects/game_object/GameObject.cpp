@@ -25,16 +25,11 @@ void GameObject::makeObject() {
     this->renderer.makeObject(shader, this->mesh, this->transform);
 }
 
-GameObject::GameObject(const std::string &pathToMesh, Shader& shader) : shader(shader) {
-    if (this->loadMesh(pathToMesh)) {
-
-        this->makeObject();
-    }
-
+GameObject::GameObject(const std::string &pathToMesh, Shader &shader) : shader(shader) {
+    this->loadMesh(pathToMesh);
 }
 
 
-GameObject::GameObject(Mesh& mesh, Shader& shader) : shader(shader), mesh(mesh) {
-        this->makeObject();
+GameObject::GameObject(Mesh &mesh, Shader &shader) : shader(shader), mesh(mesh) {
 }
 
