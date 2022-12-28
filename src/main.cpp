@@ -168,6 +168,8 @@ int main(int argc, char *argv[]) {
     double prev = 0;
     int deltaFrame = 0;
 
+    Texture* dirtTexture = new Texture("resources/textures/block.jpg");
+    Texture* steveTexture = new Texture("resources/textures/steve.png");
 
     Shader cubemapShader = loadShader("cubemap_vert.glsl", "cubemap_frag.glsl");
     cubemapShader.use();
@@ -179,6 +181,8 @@ int main(int argc, char *argv[]) {
 
     auto *player = new GameObject("resources/objects/stevy.obj", shader);
     player->makeObject();
+    player->setTextureID(steveTexture->getID());
+
     Camera camera = Camera(player->transform);
 
     glm::mat4 view = camera.getViewMatrix();
@@ -186,35 +190,10 @@ int main(int argc, char *argv[]) {
 
     player->transform.position = glm::vec3(10, 1, 10);
     // Adding texture to cube
-    GLuint texture;
 
-    glGenTextures(1, &texture);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    // Define the parameters for the texture
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    // Load the image
-
-    //Carefull depending on where your executable is, the relative path might be different from what you think it is
-    //Try to use an absolute path
-    //image usually have thei 0.0 at the top of the vertical axis and not the bottom like opengl expects
-    //stbi_set_flip_vertically_on_load(true);
-    int width, height, imNrChannels;
-    char file[128] = "resources/textures/block.jpg";
-    unsigned char *data = stbi_load(file, &width, &height, &imNrChannels, 0);
-    if (data) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    } else {
-        std::cout << "Failed to load texture block" << std::endl;
-    }
     auto *cube = new GameObject("resources/objects/cube.obj", shader);
     cube->makeObject();
+    cube->setTextureID(dirtTexture->getID());
 
     glfwSwapInterval(1);
 
@@ -228,7 +207,7 @@ int main(int argc, char *argv[]) {
             shader,
             glm::vec3(34, 20, 66),
             glm::vec3(0.0, 0.0, 0.0),
-            0.4,
+            0.9,
             0.8,
             0.5,
             32.0,

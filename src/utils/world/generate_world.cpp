@@ -24,8 +24,8 @@ World generateFlatWorld(int length, int width, int depth) {
     }
     // add higher blocks only  on the edges
     for (int i = 0; i < width; i++) {
-        map[std::make_tuple(i, length, 1)] = 1;
-        map[std::make_tuple(i, 0, 1)] = 1;
+        map[std::make_tuple(length, i, 1)] = 1;
+        map[std::make_tuple(0, i, 1)] = 1;
     }
 
     return World(map);

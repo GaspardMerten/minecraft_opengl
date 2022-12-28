@@ -5,11 +5,16 @@
 #ifndef OPENGLPROJECT_TEXTURE_H
 #define OPENGLPROJECT_TEXTURE_H
 
-
+#include <glad/glad.h>
 #include <string>
 
 class Texture {
-    Texture(std::string path);
+public:
+    GLuint textureID{};
+
+    explicit Texture(std::string path);
+
+    GLuint getID() const;
 };
 
 

@@ -18,7 +18,7 @@ int GameObject::loadMesh(const std::string &path) {
 }
 
 void GameObject::draw() {
-    this->renderer.draw(shader, this->transform, this->mesh);
+    this->renderer.draw(shader, this->transform, this->mesh, this->textureID);
 }
 
 void GameObject::makeObject() {
@@ -30,6 +30,11 @@ GameObject::GameObject(const std::string &pathToMesh, Shader &shader) : shader(s
 }
 
 
-GameObject::GameObject(Mesh &mesh, Shader &shader) : shader(shader), mesh(mesh) {
+GameObject::GameObject(Mesh &mesh, Shader &shader) : shader(shader), mesh(mesh) {}
+
+void GameObject::setTextureID(GLuint newTextureID) {
+    this->textureID = newTextureID;
 }
+
+
 

@@ -16,7 +16,7 @@ class Renderer {
 public:
     void makeObject(Shader& shader, Mesh &mesh, Transform &transform);
 
-    void draw(Shader& Shader, Transform &transform, Mesh &mesh) const;
+    void draw(Shader& Shader, Transform &transform, Mesh &mesh, GLuint textureID) const;
 };
 
 

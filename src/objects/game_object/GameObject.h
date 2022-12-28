@@ -9,6 +9,7 @@
 #include "../transform/Transform.h"
 #include "../mesh/Mesh.h"
 #include "../renderer/Renderer.h"
+#include "../texture/Texture.h"
 
 class GameObject {
 public:
@@ -26,6 +27,9 @@ public:
     Renderer renderer;
     Shader& shader;
     Transform transform;
+    GLuint textureID{};
+
+    void setTextureID(GLuint textureID);
 
     bool withShadow = false;
 };

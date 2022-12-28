@@ -12,9 +12,11 @@ World::World(std::map<std::tuple<int, int, int>, int> map) {
 
 void World::instantiateObjects(Shader &baseShader, const std::string& blockMesh) {
     Mesh mesh = Mesh(blockMesh);
+    Texture dirtTexture = Texture("resources/textures/dirt.png");
     for (auto &worldBlock : worldBlocks) {
         worldBlockInstances[worldBlock.first] = new GameObject(mesh, baseShader);
         worldBlockInstances[worldBlock.first]->makeObject();
+        worldBlockInstances[worldBlock.first]->setTextureID(dirtTexture.getID());
         worldBlockInstances[worldBlock.first]->transform.setPosition(std::get<0>(worldBlock.first), std::get<2>(worldBlock.first), std::get<1>(worldBlock.first));
     }
 }

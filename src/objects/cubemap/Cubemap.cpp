@@ -72,5 +72,5 @@ void Cubemap::draw(Camera &camera) {
 }
 
 Cubemap::Cubemap(const std::string &pathToMesh, Shader &shader) : GameObject(pathToMesh, shader) {
-
+    makeObject();
 }

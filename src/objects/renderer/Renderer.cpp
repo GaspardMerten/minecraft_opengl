@@ -4,7 +4,11 @@
 
 #include "Renderer.h"
 
-void Renderer::draw(Shader& Shader, Transform &transform, Mesh &mesh) const {
+void Renderer::draw(Shader& Shader, Transform &transform, Mesh &mesh, GLuint textureID) const {
+    // print texture
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+
     Shader.setMatrix4("M", transform.getModel());
     glBindVertexArray(this->VAO);
     glDrawArrays(GL_TRIANGLES, 0, mesh.getVerticesCount());
