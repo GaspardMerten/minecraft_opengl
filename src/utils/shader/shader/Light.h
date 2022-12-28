@@ -7,7 +7,6 @@
 
 
 #include "Shader.h"
-#include "../../../objects/camera.h"
 #include "../../../objects/camera/Camera.h"
 
 class Light {

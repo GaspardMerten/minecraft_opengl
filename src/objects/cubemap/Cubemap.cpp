@@ -3,7 +3,6 @@
 #include "../game_object/GameObject.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-#include "../camera.h"
 #include "../camera/Camera.h"
 
 #include <map>

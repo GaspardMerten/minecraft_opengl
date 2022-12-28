@@ -16,7 +16,6 @@
 #include "utils/shader/load/load_shader.h"
 #include "utils/shader/shader/Shader.h"
 #include "objects/game_object/GameObject.h"
-#include "objects/camera.h"
 #include "utils/shader/shader/Light.h"
 #include "objects/cubemap/Cubemap.h"
 #include "objects/camera/Camera.h"
@@ -185,7 +184,7 @@ int main(int argc, char *argv[]) {
     glm::mat4 view = camera.getViewMatrix();
     glm::mat4 perspective = camera.getProjectionMatrix();
 
-
+    player->transform.position = glm::vec3(10, 1, 10);
     // Adding texture to cube
     GLuint texture;
 
@@ -230,9 +229,9 @@ int main(int argc, char *argv[]) {
 
     Light light(
             shader,
-            glm::vec3(4.0, 4.0, 4.0),
+            glm::vec3(34, 20, 66),
             glm::vec3(0.0, 0.0, 0.0),
-            0.1,
+            0.4,
             0.8,
             0.5,
             32.0,
@@ -242,10 +241,15 @@ int main(int argc, char *argv[]) {
     );
     light.init();
 
-    World world = generateFlatWorld(30, 30, 5);
-    world.instantiateObjects(shader, "resources/object/cube.obj");
+    World world = generateFlatWorld(100, 100, 1);
+    world.instantiateObjects(shader, "resources/objects/cube.obj");
 
     PlayerControls controls = PlayerControls(player->transform, camera, world);
+    //2. Use the shader Class to send the uniform
+    glm::mat4 model = glm::mat4(1.0);
+    model = glm::translate(model, glm::vec3(1.0, 1.0, 2.0));
+    model = glm::scale(model, glm::vec3(1.2, 1.2, 1.2));
+    light.use(camera, model);
 
     while (!glfwWindowShouldClose(window)) {
         controls.processControls(window);
@@ -259,26 +263,15 @@ int main(int argc, char *argv[]) {
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        cubemapShader.use();
 
         shader.use();
-
-
-        //2. Use the shader Class to send the uniform
-        glm::mat4 model = glm::mat4(1.0);
-        model = glm::translate(model, glm::vec3(1.0, 1.0, 2.0));
-        model = glm::scale(model, glm::vec3(1.2, 1.2, 1.2));
-        light.use(camera, model);
 
         shader.setMatrix4("V", view);
         shader.setMatrix4("P", perspective);
 
-        world.draw();
-
         cube->draw();
-
         player->draw();
-
+        world.draw();
 
 
         // get current mouse position

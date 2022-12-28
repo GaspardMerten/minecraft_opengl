@@ -15,7 +15,7 @@ void Mesh::loadMesh(const std::string &path) {
     auto positions = std::vector<glm::vec3>();
     auto textures = std::vector<glm::vec2>();
     auto normals = std::vector<glm::vec3>();
-    int x = 0;
+
     while (std::getline(infile, line)) {
         std::istringstream iss(line);
         std::string indice;

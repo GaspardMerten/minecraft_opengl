@@ -21,6 +21,7 @@ void World::instantiateObjects(Shader &baseShader, const std::string& blockMesh)
 
 void World::draw() {
     for (auto &worldBlockInstance : worldBlockInstances) {
+        // Print block
         worldBlockInstance.second->draw();
     }
 }

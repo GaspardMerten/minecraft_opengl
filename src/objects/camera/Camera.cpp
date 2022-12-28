@@ -18,6 +18,6 @@ glm::mat4 Camera::getViewMatrix()  {
     return glm::inverse(model);
 }
 
-glm::mat4 Camera::getProjectionMatrix() const {
-    return glm::perspective(glm::radians(45.0f), 16.0f / 9.0f, 0.1f, 100.0f);
+glm::mat4 Camera::getProjectionMatrix() {
+    return glm::perspective(glm::radians(45.0f), 16.0f / 9.0f, 0.01f, 200.0f);
 }

@@ -17,7 +17,7 @@ public:
 
     glm::mat4 getViewMatrix();
 
-    glm::mat4 getProjectionMatrix() const;
+    glm::mat4 getProjectionMatrix();
 
 };
 

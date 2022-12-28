@@ -3,7 +3,6 @@
 //
 
 #include "Light.h"
-#include "../../../objects/camera.h"
 
 Light::Light(Shader shader, glm::vec3 position, glm::vec3 materialColor, float ambientStrength, float specularStrength,
              float diffuseStrength, float shininess, float linear, float quadratic, float constant) : shader(shader) {
