@@ -85,6 +85,9 @@ void Transform::rotateX(double x) {
     setRotationX(rotation.x + x);
 }
 
+glm::vec3 Transform::getPosition() {
+    return position;
+}
 
 Transform::Transform() {
     this->model = glm::mat4(1.0);

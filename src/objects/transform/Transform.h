@@ -11,9 +11,7 @@
 
 class Transform {
 private:
-    glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
     glm::vec3 scaling = glm::vec3(1.0f, 1.0f, 1.0f);
-    glm::vec3 rotation = glm::vec3(.0f, .0f, .0f);
 
     glm::mat4 model = glm::mat4(1.0);
 
@@ -53,7 +51,12 @@ public:
 
     void setRotationY(double x);
 
+    glm::vec3 getPosition();
+
     Transform();
+
+    glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 rotation = glm::vec3(.0f, .0f, .0f);
 };
 
 

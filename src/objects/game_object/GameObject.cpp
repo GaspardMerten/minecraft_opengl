@@ -28,8 +28,13 @@ void GameObject::makeObject() {
 GameObject::GameObject(const std::string &pathToMesh, Shader& shader) : shader(shader) {
     if (this->loadMesh(pathToMesh)) {
 
-    this->makeObject();
+        this->makeObject();
     }
 
+}
+
+
+GameObject::GameObject(Mesh& mesh, Shader& shader) : shader(shader), mesh(mesh) {
+        this->makeObject();
 }
 

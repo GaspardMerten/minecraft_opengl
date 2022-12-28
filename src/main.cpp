@@ -16,6 +16,10 @@
 #include "utils/shader/shader/Shader.h"
 #include "objects/game_object/GameObject.h"
 #include "objects/camera.h"
+#include "objects/camera/Camera.h"
+#include "utils/world/generate_world.h"
+#include "world/World.h"
+#include "controls/player_controls/PlayerControls.h"
 
 #define SHADER_PATH "shaders/"
 
@@ -116,7 +120,6 @@ void APIENTRY glDebugOutput(GLenum source,
 
 #endif
 
-Camera camera(glm::vec3(1.0, 0.0, -6.0),glm::vec3(0.0,1.0,0.0), 90.0);
 
 int main(int argc, char *argv[]) {
     if (!glfwInit()) {
@@ -167,13 +170,14 @@ int main(int argc, char *argv[]) {
     int deltaFrame = 0;
 
 
-    glm::mat4 view = camera.GetViewMatrix();
-    glm::mat4 perspective = camera.GetProjectionMatrix();
-
-
     auto *cube = new GameObject("resources/objects/bunny_small.obj", Shader);
+    auto *cube2 = new GameObject("resources/objects/cube.obj", Shader);
 
+    cube->transform.setPosition(0,3, 0);
+    Camera camera = Camera(cube->transform);
 
+    glm::mat4 view = camera.getViewMatrix();
+    glm::mat4 perspective = camera.getProjectionMatrix();
 
     glfwSwapInterval(1);
 
@@ -182,18 +186,25 @@ int main(int argc, char *argv[]) {
     double prevY = 0;
 
     glfwGetCursorPos(window, &prevX, &prevY);
+    World world = generateFlatWorld(100, 100, 2);
+    world.instantiateObjects(Shader, "resources/objects/cube.obj");
 
+    PlayerControls* controls = new PlayerControls(cube->transform, camera, world);
 
     while (!glfwWindowShouldClose(window)) {
+        controls->processControls(window);
+
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
         glViewport(0, 0, width, height);
 
-        view = camera.GetViewMatrix();
+        view = camera.getViewMatrix();
         glfwPollEvents();
         double now = glfwGetTime();
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
 
         //2. Use the shader Class to send the uniform
         Shader.use();
@@ -201,21 +212,14 @@ int main(int argc, char *argv[]) {
         Shader.setMatrix4("V", view);
         Shader.setMatrix4("P", perspective);
 
-        cube->draw();
-
-
-
+        world.draw();
         // get current mouse position
         double xpos, ypos;
 
+        cube->draw();
+        // if the left button is pressed
+
         glfwGetCursorPos(window, &xpos, &ypos);
-
-
-        // compute new orientation
-        camera.ProcessMouseMovement(xpos - prevX, prevY - ypos, height, width);
-        prevX = xpos;
-        prevY = ypos;
-
         glfwSwapBuffers(window);
     }
 

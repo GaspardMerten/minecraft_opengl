@@ -14,6 +14,8 @@ class GameObject{
 public:
     GameObject(const std::string &pathToMesh, Shader &shader);
 
+    GameObject(Mesh &mesh, Shader &shader);
+
     int loadMesh(const std::string& path);
 
     void draw();

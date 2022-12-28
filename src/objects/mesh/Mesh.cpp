@@ -108,7 +108,6 @@ float *Mesh::toFloatArray() {
         data[i * 8 + 7] = v.normal.z;
     }
 
-std::cout << "Vertices count: " << verticesCount << std::endl;
 
     return data;
 }

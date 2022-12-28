@@ -9,6 +9,7 @@
 #include "../transform/Transform.h"
 
 class Camera {
+    float zoom = 1.0f;
 public:
     explicit Camera(Transform &transform);
 
@@ -16,7 +17,8 @@ public:
 
     glm::mat4 getViewMatrix();
 
-    glm::mat4 getProjectionMatrix();
+    glm::mat4 getProjectionMatrix() const;
+
 };
 
 
