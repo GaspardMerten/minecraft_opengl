@@ -31,7 +31,7 @@ const int height = 500;
 GLuint compileProgram(GLuint vertexShader, GLuint fragmentShader);
 
 
-Shader loadShader(const std::string& vertexPath, const std::string& fragmentPath);
+Shader loadShader(const std::string &vertexPath, const std::string &fragmentPath);
 
 #ifndef NDEBUG
 
@@ -169,7 +169,7 @@ int main(int argc, char *argv[]) {
     int deltaFrame = 0;
 
 
-    Shader cubemapShader = loadShader("cubemap_vert.glsl","cubemap_frag.glsl");
+    Shader cubemapShader = loadShader("cubemap_vert.glsl", "cubemap_frag.glsl");
     cubemapShader.use();
     auto *cubemap = new Cubemap("resources/objects/cube.obj", cubemapShader);
     cubemap->makeObject();
@@ -206,14 +206,11 @@ int main(int argc, char *argv[]) {
     //stbi_set_flip_vertically_on_load(true);
     int width, height, imNrChannels;
     char file[128] = "resources/textures/block.jpg";
-    unsigned char* data = stbi_load(file, &width, &height, &imNrChannels, 0);
-    if (data)
-    {
+    unsigned char *data = stbi_load(file, &width, &height, &imNrChannels, 0);
+    if (data) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
+    } else {
         std::cout << "Failed to load texture block" << std::endl;
     }
     auto *cube = new GameObject("resources/objects/cube.obj", shader);
@@ -262,6 +259,10 @@ int main(int argc, char *argv[]) {
         double now = glfwGetTime();
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glDepthFunc(GL_LESS);
+        glEnable(GL_DEPTH_TEST);
+        glDepthMask(GL_TRUE);
+        cubemap->draw(camera);
 
 
         shader.use();
@@ -294,7 +295,7 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-Shader loadShader(const std::string& vertexPath, const std::string& fragmentPath) {
+Shader loadShader(const std::string &vertexPath, const std::string &fragmentPath) {
     // join folder path with shader file name (platform independent)
     std::string vertexShaderPath = SHADER_PATH + vertexPath;
     std::string fragmentShaderPath = SHADER_PATH + fragmentPath;

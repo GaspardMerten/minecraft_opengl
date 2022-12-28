@@ -26,6 +26,8 @@ public:
     Renderer renderer;
     Shader& shader;
     Transform transform;
+
+    bool withShadow = false;
 };
 
 

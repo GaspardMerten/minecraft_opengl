@@ -42,15 +42,15 @@ void Cubemap::makeObject() {
 
     //stbi_set_flip_vertically_on_load(true);
 
-    std::string pathToCubeMap = R"(resources/yokohama3/)";
+    std::string pathToCubeMap = R"(resources/)";
 
     std::map<std::string, GLenum> facesToLoad = {
-            {pathToCubeMap + "posx.jpg",GL_TEXTURE_CUBE_MAP_POSITIVE_X},
-            {pathToCubeMap + "posy.jpg",GL_TEXTURE_CUBE_MAP_POSITIVE_Y},
-            {pathToCubeMap + "posz.jpg",GL_TEXTURE_CUBE_MAP_POSITIVE_Z},
-            {pathToCubeMap + "negx.jpg",GL_TEXTURE_CUBE_MAP_NEGATIVE_X},
-            {pathToCubeMap + "negy.jpg",GL_TEXTURE_CUBE_MAP_NEGATIVE_Y},
-            {pathToCubeMap + "negz.jpg",GL_TEXTURE_CUBE_MAP_NEGATIVE_Z},
+            {pathToCubeMap + "front.jpg",GL_TEXTURE_CUBE_MAP_POSITIVE_X},
+            {pathToCubeMap + "top.jpg",GL_TEXTURE_CUBE_MAP_POSITIVE_Y},
+            {pathToCubeMap + "left.jpg",GL_TEXTURE_CUBE_MAP_POSITIVE_Z},
+            {pathToCubeMap + "back.jpg",GL_TEXTURE_CUBE_MAP_NEGATIVE_X},
+            {pathToCubeMap + "bottom.jpg",GL_TEXTURE_CUBE_MAP_NEGATIVE_Y},
+            {pathToCubeMap + "right.jpg",GL_TEXTURE_CUBE_MAP_NEGATIVE_Z},
     };
     //load the six faces
     for (std::pair<std::string, GLenum> pair : facesToLoad) {
@@ -71,6 +71,6 @@ void Cubemap::draw(Camera &camera) {
 
 }
 
-Cubemap::   Cubemap(const std::string &pathToMesh, Shader &shader) : GameObject(pathToMesh, shader) {
+Cubemap::Cubemap(const std::string &pathToMesh, Shader &shader) : GameObject(pathToMesh, shader) {
 
 }

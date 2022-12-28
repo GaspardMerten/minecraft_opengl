@@ -24,6 +24,7 @@ public:
     PlayerControls(Transform &transform, Camera &camera, World& world);
 
     void processControls(GLFWwindow* window);
+
 };
 
 

@@ -93,7 +93,7 @@ int Mesh::getVerticesCount() {
 float *Mesh::toFloatArray() {
     int verticesCount = getVerticesCount();
     auto* data = new float[8 * verticesCount];
-    
+
     for (int i = 0; i < verticesCount; i++) {
         MeshVertex v = vertices.at(i);
         data[i * 8] = v.position.x;

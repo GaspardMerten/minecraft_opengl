@@ -32,7 +32,6 @@ void Light::use(Camera & camera, glm::mat4 model) const {
     glm::mat4 inverseModel = glm::transpose( glm::inverse(model));
 
     shader.setMatrix4("itM", inverseModel);
-
     shader.setVector3f("u_view_pos", camera.transform.position);
 
 }
