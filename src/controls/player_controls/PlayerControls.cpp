@@ -37,9 +37,9 @@ void PlayerControls::processEvents(GLFWwindow *window) {
     // rotate if pressing left alt
     if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS) {
         if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-            transform.rotateY(0.1);
+            transform.rotateY(2);
         } else if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-            transform.rotateY(-0.1);
+            transform.rotateY(-2);
         }
     }
 
