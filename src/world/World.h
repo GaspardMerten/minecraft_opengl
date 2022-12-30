@@ -21,9 +21,11 @@ public:
 public:
     std::map<std::tuple<int, int, int>, int> worldBlocks;
 
-    void instantiateObjects(Shader &baseShader, const std::string& blockMesh);
+    void instantiateObjects(const std::string& blockMesh);
 
-    void draw();
+    void draw(Shader& shader);
+
+    void makeObjects(Shader &shader);
 };
 
 

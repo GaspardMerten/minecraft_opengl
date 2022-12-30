@@ -2,7 +2,8 @@
 #include "../load/load_shader.h"
 #include "glm/gtc/type_ptr.hpp"
 
-Shader::Shader(std::string &vertexShaderPath, std::string &fragmentShaderPath) {
+
+Shader::Shader(std::string &vertexShaderPath, std::string &fragmentShaderPath, bool withTexture) : withTexture(withTexture) {
     GLuint shaderV;
     GLuint shaderF;
 
@@ -75,3 +76,4 @@ GLuint Shader::compileProgram(GLuint vertexShader, GLuint fragmentShader) {
     }
     return programID;
 }
+

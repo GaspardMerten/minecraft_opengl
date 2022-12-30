@@ -17,7 +17,6 @@
 #include "utils/shader/shader/Shader.h"
 #include "objects/game_object/GameObject.h"
 #include "utils/shader/shader/Light.h"
-#include "objects/cubemap/Cubemap.h"
 #include "objects/camera/Camera.h"
 #include "controls/player_controls/PlayerControls.h"
 #include "utils/world/generate_world.h"
@@ -30,10 +29,7 @@ const int width = 500;
 const int height = 500;
 
 
-GLuint compileProgram(GLuint vertexShader, GLuint fragmentShader);
-
-
-Shader loadShader(const std::string &vertexPath, const std::string &fragmentPath);
+Shader loadShader(const std::string &vertexPath, const std::string &fragmentPath, bool withTexture = true);
 
 #ifndef NDEBUG
 
@@ -170,21 +166,20 @@ int main(int argc, char *argv[]) {
     double prev = 0;
     int deltaFrame = 0;
 
-    TextureManager::linkTexture(TextureType::DIRT,  "resources/textures/dirt.jpg");
+    TextureManager::linkTexture(TextureType::DIRT, "resources/textures/dirt.jpg");
     TextureManager::linkTexture(TextureType::PLAYER, "resources/textures/steve.jpg");
 
-    Shader cubemapShader = loadShader("cubemap_vert.glsl", "cubemap_frag.glsl");
-    cubemapShader.use();
-    auto *cubemap = new Cubemap("resources/objects/cube.obj", cubemapShader);
-    cubemap->makeObject();
 
+    Shader shadowShader = loadShader("shadow.vert.glsl", "shadow.frag.glsl", false);
     Shader shader = loadShader("vertex.glsl", "fragment.glsl");
     shader.use();
 
-    auto *player = new GameObject("resources/objects/stevy.obj", shader);
-    auto *player2 = new GameObject("resources/objects/stevy.obj", shader);
-    player->makeObject();
-    player2->makeObject();
+    auto *player = new GameObject("resources/objects/stevy.obj");
+    auto *player2 = new GameObject("resources/objects/stevy.obj");
+    player->makeObject(shader);
+    player2->makeObject(shader);
+    player->makeObject(shadowShader);
+    player2->makeObject(shadowShader);
     player->setTextureID(TextureManager::getTextureID(TextureType::PLAYER));
     player2->setTextureID(TextureManager::getTextureID(TextureType::PLAYER));
 
@@ -198,8 +193,9 @@ int main(int argc, char *argv[]) {
     player2->transform.setRotationY(90);
     // Adding texture to cube
 
-    auto *cube = new GameObject("resources/objects/cube.obj", shader);
-    cube->makeObject();
+    auto *cube = new GameObject("resources/objects/cube.obj");
+    cube->makeObject(shader);
+    cube->makeObject(shadowShader);
     cube->setTextureID(TextureManager::getTextureID(TextureType::DIRT));
 
     glfwSwapInterval(1);
@@ -225,7 +221,8 @@ int main(int argc, char *argv[]) {
     light.init();
 
     World world = generateFlatWorld(100, 100, 1);
-    world.instantiateObjects(shader, "resources/objects/cube.obj");
+    world.instantiateObjects("resources/objects/cube.obj");
+    world.makeObjects(shader);
 
     PlayerControls controls = PlayerControls(player->transform, camera, world);
     CameraControls cameraControls = CameraControls(camera, window);
@@ -235,32 +232,77 @@ int main(int argc, char *argv[]) {
     model = glm::scale(model, glm::vec3(1.2, 1.2, 1.2));
     light.use(camera, model);
 
+
+    /**
+     * Shadow part
+     */
+    // Take care of all the light related things
+    unsigned int depthMapFBO;
+    glGenFramebuffers(1, &depthMapFBO);
+    const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+
+    unsigned int depthMap;
+    glGenTextures(1, &depthMap);
+    glBindTexture(GL_TEXTURE_2D, depthMap);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
+                 SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    float near_plane = 1.0f, far_plane = 7.5f;
+    glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+
+    glm::mat4 lightView = glm::lookAt(glm::vec3(0.0f, 10.0f, 0.0f),
+                                      glm::vec3(0.0f, 0.0f, 0.0f),
+                                      glm::vec3(0.0f, 1.0f, 0.0f));
+
+    glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+
+    glDepthFunc(GL_LESS);
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
+
+
     while (!glfwWindowShouldClose(window)) {
         controls.processEvents(window);
 
         int width, height;
-        glfwGetFramebufferSize(window, &width, &height);
-        glViewport(0, 0, width, height);
 
         view = camera.getViewMatrix();
         glfwPollEvents();
-        double now = glfwGetTime();
+
+        glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        shadowShader.use();
+        shadowShader.setMatrix4("V", view);
+        shadowShader.setMatrix4("P", perspective);
+        shadowShader.setMatrix4("lightSpaceMatrix", lightSpaceMatrix);
+        cube->draw(shadowShader);
+        world.draw(shadowShader);
+        player->draw(shadowShader);
+        player2->draw(shadowShader);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glDepthFunc(GL_LESS);
-        glEnable(GL_DEPTH_TEST);
-        glDepthMask(GL_TRUE);
-        cubemap->draw(camera);
-
+        glfwGetFramebufferSize(window, &width, &height);
+        glViewport(0, 0, width, height);
 
         shader.use();
         shader.setMatrix4("V", view);
         shader.setMatrix4("P", perspective);
 
-        cube->draw();
-        world.draw();
-        player->draw();
-        player2->draw();
+        cube->draw(shader);
+        world.draw(shader);
+        player->draw(shader);
+        player2->draw(shader);
 
 
         // get current mouse position
@@ -284,12 +326,12 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-Shader loadShader(const std::string &vertexPath, const std::string &fragmentPath) {
+Shader loadShader(const std::string &vertexPath, const std::string &fragmentPath, bool withTexture) {
     // join folder path with shader file name (platform independent)
     std::string vertexShaderPath = SHADER_PATH + vertexPath;
     std::string fragmentShaderPath = SHADER_PATH + fragmentPath;
 
-    return {vertexShaderPath, fragmentShaderPath};
+    return {vertexShaderPath, fragmentShaderPath, withTexture};
 }
 
 

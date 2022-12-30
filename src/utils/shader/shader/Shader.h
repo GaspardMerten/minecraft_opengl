@@ -15,7 +15,7 @@ class Shader
 public:
     GLuint ID;
 
-    Shader(std::string &vertexShaderPath, std::string &fragmentShaderPath);
+    Shader(std::string &vertexShaderPath, std::string &fragmentShaderPath, bool withTexture = true);
 
     void use() const;
     void setInteger(const GLchar *name, GLint value) const;
@@ -24,6 +24,7 @@ public:
     void setVector3f(const GLchar* name, const glm::vec3& value) const;
     void setMatrix4(const GLchar* name, const glm::mat4& matrix) const;
 
+    bool withTexture;
 private:
     static GLuint compileShader(const std::string& shaderCode, GLenum shaderType);
 

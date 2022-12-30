@@ -8,10 +8,12 @@ out vec3 v_normal;
 
 out vec4 v_col;
 out vec2 v_t;
+out vec4 fragPosLightSpace;
 uniform mat4 M;
 uniform mat4 itM;
 uniform mat4 V;
 uniform mat4 P;
+uniform mat4 lightSpaceMatrix;
 
 void main(){
     vec4 frag_coord = M * vec4(position, 1.0);
@@ -20,6 +22,8 @@ void main(){
     v_normal = vec3(itM * vec4(normal, 0.0));
     v_frag_coord = frag_coord.xyz;
 
+
+    fragPosLightSpace = lightSpaceMatrix * vec4(vec3(M*vec4(position, 1.0)), 1);
     v_t = tex_coord;
     gl_Position = P*V*frag_coord;
 }

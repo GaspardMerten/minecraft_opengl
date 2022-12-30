@@ -7,6 +7,7 @@ in vec3 v_frag_coord;
 in vec3 v_normal;
 in vec2 v_t;
 
+
 uniform vec3 u_view_pos;
 uniform sampler2D tex;
 

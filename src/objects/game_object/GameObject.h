@@ -12,25 +12,24 @@
 
 class GameObject {
 public:
-    GameObject(const std::string &pathToMesh, Shader &shader);
+    explicit GameObject(const std::string &pathToMesh);
 
-    GameObject(Mesh &mesh, Shader &shader);
+    explicit GameObject(Mesh &mesh);
 
     int loadMesh(const std::string& path);
 
-    virtual void draw();
-
-    virtual void makeObject();
 
     Mesh mesh;
     Renderer renderer;
-    Shader& shader;
     Transform transform;
     GLuint textureID{};
 
     void setTextureID(GLuint textureID);
 
-    bool withShadow = false;
+    void draw(Shader& shader);
+
+    void makeObject(Shader& shader);
+
 };
 
 
