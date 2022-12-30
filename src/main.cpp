@@ -267,7 +267,7 @@ int main(int argc, char *argv[]) {
     glDepthFunc(GL_LESS);
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
-
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
     while (!glfwWindowShouldClose(window)) {
         controls.processEvents(window);

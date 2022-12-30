@@ -16,3 +16,4 @@ CameraControls::CameraControls(Camera &camera, GLFWwindow *window) : camera(came
         std::cout << Camera::zoom << std::endl;
     });
 }
+

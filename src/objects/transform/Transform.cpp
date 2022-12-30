@@ -2,6 +2,8 @@
 // Created by gaspa on 27/12/2022.
 //
 
+#include <cmath>
+#include <iostream>
 #include "Transform.h"
 #include "glm/ext/matrix_transform.hpp"
 
@@ -20,6 +22,13 @@ void Transform::setPosition(double x, double y) {
 
 void Transform::setRotation(double x, double y, double z) {
     markAsDirtyState();
+    if (x > 14) {
+        x = 14;
+    } else if (x < -90) {
+        x = -90;
+    }
+    // print x
+    std::cout << x << std::endl;
     this->rotation = glm::vec3(x, y, z);
 }
 
@@ -39,14 +48,23 @@ void Transform::setScale(double x, double y) {
 }
 
 void Transform::translate(double x, double y, double z) {
+    float rotYRadian = glm::radians(rotation.y);
+    // print rotYRadian
+    std::cout << rotYRadian << std::endl;
+
+    const double oldX = x;
+    const double oldZ = z;
+
+    float cosRotY = std::cos(rotYRadian);
+    float sinRotY = std::sin(rotYRadian);
+
+    x =  oldX * cosRotY + oldZ * sinRotY;
+    z = - oldX * sinRotY + oldZ * cosRotY;
+
     setPosition(this->position.x + x, this->position.y + y, this->position.z + z);
 }
 
-void Transform::translate(double x, double y) {
-    setPosition(this->position.x + x, this->position.y + y, this->position.z);
-}
-
-glm::mat4 Transform::getModel()  {
+glm::mat4 Transform::getModel() {
     if (isDirty) {
         model = glm::mat4(1.0);
         model = glm::translate(model, position);

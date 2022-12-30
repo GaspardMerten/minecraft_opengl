@@ -8,15 +8,17 @@ PlayerControls::PlayerControls(Transform &transform, Camera &camera, World &worl
         : transform(transform), camera(camera), world(world) {}
 
 void PlayerControls::processEvents(GLFWwindow *window) {
+    processMouse(window);
+
     glm::vec3 oldPosition = this->transform.position;
 
     if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) != GLFW_PRESS) {
 
         if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-            transform.translate(-1, 0);
+            transform.translate(-1, 0, 0);
         }
         if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-            transform.translate(1, 0);
+            transform.translate(1, 0, 0);
         }
         if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
             transform.translate(0, 0, -1);
@@ -50,3 +52,25 @@ void PlayerControls::processEvents(GLFWwindow *window) {
 }
 
 
+void PlayerControls::processMouse(GLFWwindow *window) {
+    int windowWidth, windowHeight;
+    glfwGetWindowSize(window, &windowWidth, &windowHeight);
+    double x, y;
+
+    glfwGetCursorPos(window, &x, &y);
+
+    double delta_x = x - lastX;
+    // double delta_y = y - lastY; // strange behaviour (should move camera not player)
+
+    transform.rotateY(-delta_x * mouseSensitivity);
+
+    // if escape is pressed, reset the mouse position
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS) {
+        glfwSetCursorPos(window, windowWidth/2, windowHeight/2);
+    }
+    // wrap pointer
+
+
+    lastX = windowWidth/2;
+    lastY = windowHeight/2;
+}

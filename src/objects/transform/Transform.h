@@ -33,7 +33,6 @@ public:
 
     void setScale(double x, double y);
 
-    void translate(double x, double y);
 
     glm::mat4 getModel();
 

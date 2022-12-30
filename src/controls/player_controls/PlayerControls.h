@@ -18,13 +18,16 @@ class PlayerControls {
     Camera &camera;
 
     float speed = 1;
-    float mouseSensitivity = 0.1;
+    float mouseSensitivity = 0.05;
 
+    double lastX = 0;
+    double lastY = 0;
 public:
     PlayerControls(Transform &transform, Camera &camera, World& world);
 
     void processEvents(GLFWwindow* window);
 
+    void processMouse(GLFWwindow *window);
 };
 
 
