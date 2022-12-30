@@ -169,7 +169,6 @@ int main(int argc, char *argv[]) {
     TextureManager::linkTexture(TextureType::DIRT, "resources/textures/dirt.jpg");
     TextureManager::linkTexture(TextureType::PLAYER, "resources/textures/steve.jpg");
 
-
     Shader shadowShader = loadShader("shadow.vert.glsl", "shadow.frag.glsl", false);
     Shader shader = loadShader("vertex.glsl", "fragment.glsl");
     shader.use();
@@ -212,7 +211,7 @@ int main(int argc, char *argv[]) {
             glm::vec3(0.0, 0.0, 0.0),
             0.9,
             0.8,
-            0.5,
+            10.5,
             32.0,
             0.14,
             0.01,
@@ -259,7 +258,9 @@ int main(int argc, char *argv[]) {
     float near_plane = 1.0f, far_plane = 7.5f;
     glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
 
-    glm::mat4 lightView = glm::inverse(model);
+    glm::mat4 lightView = glm::lookAt(glm::vec3(0.0f, 10.0f, 0.0f),
+                                      glm::vec3(0.0f, 0.0f, 0.0f),
+                                      glm::vec3(0.0f, 1.0f, 0.0f));
 
     glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
@@ -283,10 +284,12 @@ int main(int argc, char *argv[]) {
         shadowShader.setMatrix4("V", view);
         shadowShader.setMatrix4("P", perspective);
         shadowShader.setMatrix4("lightSpaceMatrix", lightSpaceMatrix);
+        glCullFace(GL_FRONT);
         cube->draw(shadowShader);
         world.draw(shadowShader);
         player->draw(shadowShader);
         player2->draw(shadowShader);
+        glCullFace(GL_BACK);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -296,7 +299,7 @@ int main(int argc, char *argv[]) {
         shader.use();
         shader.setMatrix4("V", view);
         shader.setMatrix4("P", perspective);
-
+        glBindTexture(GL_TEXTURE_2D, depthMap);
         cube->draw(shader);
         world.draw(shader);
         player->draw(shader);
