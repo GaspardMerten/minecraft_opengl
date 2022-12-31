@@ -4,19 +4,19 @@
 
 #include "Renderer.h"
 
-void Renderer::draw(Shader &Shader, Transform &transform, Mesh &mesh, GLuint textureID) const {
+void Renderer::draw(Shader &Shader, Transform &transform, Mesh *mesh, GLuint textureID) const {
     // print texture
     glBindTexture(GL_TEXTURE_2D, textureID);
     glActiveTexture(GL_TEXTURE0);
 
     Shader.setMatrix4("M", transform.getModel());
     glBindVertexArray(this->VAO);
-    glDrawArrays(GL_TRIANGLES, 0, mesh.getVerticesCount());
+    glDrawArrays(GL_TRIANGLES, 0, mesh->getVerticesCount());
 }
 
-void Renderer::makeObject(Shader &shader, Mesh &mesh, Transform &transform) {
-    float *data = mesh.toFloatArray();
-    int dataSize = mesh.getFloatArraySize();
+void Renderer::makeObject(Shader &shader, Mesh * mesh, Transform &transform) {
+    float *data = mesh->toFloatArray();
+    int dataSize = mesh->getFloatArraySize();
 
     if (this->VAO == 0) {
         glGenVertexArrays(1, &VAO);
@@ -27,9 +27,6 @@ void Renderer::makeObject(Shader &shader, Mesh &mesh, Transform &transform) {
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferData(GL_ARRAY_BUFFER, dataSize, data, GL_STATIC_DRAW);
     } else {
-        // prinnt shit
-        std::cout << "VAO already exists" << std::endl;
-
         glBindVertexArray(VAO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
     }

@@ -14,9 +14,9 @@
 class Renderer {
     GLuint VBO{}, VAO{};
 public:
-    void makeObject(Shader& shader, Mesh &mesh, Transform &transform);
+    void makeObject(Shader& shader, Mesh * mesh, Transform &transform);
 
-    void draw(Shader& Shader, Transform &transform, Mesh &mesh, GLuint textureID) const;
+    void draw(Shader& Shader, Transform &transform, Mesh *mesh, GLuint textureID) const;
 };
 
 

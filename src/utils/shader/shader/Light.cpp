@@ -4,9 +4,13 @@
 
 #include "Light.h"
 
-Light::Light(Shader shader, glm::vec3 position, glm::vec3 materialColor, float ambientStrength, float specularStrength,
-             float diffuseStrength, float shininess, float linear, float quadratic, float constant) : shader(shader) {
-    this->position = position;
+
+Light::Light(glm::vec3 position, glm::vec3 materialColor, float ambientStrength, float specularStrength,
+             float diffuseStrength, float shininess, float linear, float quadratic, float constant) {
+
+    this->transform = new Transform();
+    transform->setPosition(position.x, position.y, position.z);
+
     this->materialColor = materialColor;
     this->ambientStrength = ambientStrength;
     this->specularStrength = specularStrength;
@@ -17,7 +21,7 @@ Light::Light(Shader shader, glm::vec3 position, glm::vec3 materialColor, float a
     this->constant = constant;
 }
 
-void Light::init() {
+void Light::linkShader(Shader& shader) const {
     shader.setFloat("shininess", shininess);
     shader.setVector3f("materialColour", materialColor);
     shader.setFloat("light.ambient_strength", ambientStrength);
@@ -28,10 +32,14 @@ void Light::init() {
     shader.setFloat("light.quadratic", quadratic);
 }
 
-void Light::use(Camera & camera, glm::mat4 model) const {
-    glm::mat4 inverseModel = glm::transpose( glm::inverse(model));
+glm::mat4 Light::getSpaceMatrix() const {
+    const glm::mat4 &viewMatrix = glm::inverse(transform->getModel());
 
-    shader.setMatrix4("itM", inverseModel);
-    shader.setVector3f("u_view_pos", camera.transform.position);
+    glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.01f, 100.0f);
 
+    return viewMatrix * lightProjection;
+}
+
+void Light::use(Shader& shader) const {
+    shader.setVector3f("light.light_pos", transform->position);
 }

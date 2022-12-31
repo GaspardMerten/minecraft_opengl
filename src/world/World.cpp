@@ -4,6 +4,7 @@
 
 #include "World.h"
 #include "../texture/manager/TextureManager.h"
+#include "../objects/mesh/manager/MeshManager.h"
 
 #include <utility>
 
@@ -11,9 +12,9 @@ World::World(std::map<std::tuple<int, int, int>, int> map) {
     worldBlocks = std::move(map);
 }
 
-void World::instantiateObjects(const std::string& blockMesh) {
-    Mesh mesh = Mesh(blockMesh);
+void World::create() {
     GLuint textureId = TextureManager::getTextureID(TextureType::DIRT);
+    auto mesh = MeshManager::getMesh(MeshType::BLOCK);
 
     for (auto &worldBlock : worldBlocks) {
         worldBlockInstances[worldBlock.first] = new GameObject(mesh);

@@ -5,9 +5,9 @@
 #include "GameObject.h"
 
 int GameObject::loadMesh(const std::string &path) {
-    this->mesh = Mesh(path);
+    this->mesh = new Mesh(path);
 
-    if (mesh.isLoaded()) {
+    if (mesh->isLoaded()) {
         // print good
         std::cout << "Mesh loaded successfully" << std::endl;
         return 1;
@@ -30,7 +30,7 @@ GameObject::GameObject(const std::string &pathToMesh)  {
 }
 
 
-GameObject::GameObject(Mesh &mesh) : mesh(mesh) {}
+GameObject::GameObject(Mesh *mesh) : mesh(mesh) {}
 
 void GameObject::setTextureID(GLuint newTextureID) {
     this->textureID = newTextureID;

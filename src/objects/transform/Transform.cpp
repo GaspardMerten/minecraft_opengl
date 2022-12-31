@@ -28,7 +28,6 @@ void Transform::setRotation(double x, double y, double z) {
         x = -90;
     }
     // print x
-    std::cout << x << std::endl;
     this->rotation = glm::vec3(x, y, z);
 }
 
@@ -49,8 +48,6 @@ void Transform::setScale(double x, double y) {
 
 void Transform::translate(double x, double y, double z) {
     float rotYRadian = glm::radians(rotation.y);
-    // print rotYRadian
-    std::cout << rotYRadian << std::endl;
 
     const double oldX = x;
     const double oldZ = z;

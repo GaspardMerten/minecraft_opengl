@@ -11,9 +11,8 @@
 
 class Light {
 public:
-    Shader shader;
-    glm::vec3 position;
-    glm::vec3 materialColor;
+    Transform* transform;
+    glm::vec3 materialColor{};
     float ambientStrength;
     float specularStrength;
     float diffuseStrength;
@@ -23,11 +22,13 @@ public:
     float quadratic;
     float constant;
 
-    Light(Shader shader, glm::vec3 position, glm::vec3 materialColor, float ambientStrength, float specularStrength, float diffuseStrength, float shininess, float linear, float quadratic, float constant);
+    Light(glm::vec3 position, glm::vec3 materialColor, float ambientStrength, float specularStrength, float diffuseStrength, float shininess, float linear, float quadratic, float constant);
 
-    void init();
-    void use(Camera& camera, glm::mat4 model) const;
+    void linkShader(Shader &shader) const;
 
+    void use(Shader &shader) const;
+
+    glm::mat4 getSpaceMatrix() const;
 };
 
 

@@ -15,7 +15,7 @@ class PlayerControls {
 
     Transform& transform;
     World& world;
-    Camera &camera;
+    Camera& camera;
 
     float speed = 1;
     float mouseSensitivity = 0.05;

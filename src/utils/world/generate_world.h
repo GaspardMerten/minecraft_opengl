@@ -6,5 +6,5 @@
 
 
 
-World generateFlatWorld(int length, int width, int depth);
+World* generateFlatWorld(int length, int width, int depth);
 

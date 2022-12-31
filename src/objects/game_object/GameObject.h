@@ -14,12 +14,12 @@ class GameObject {
 public:
     explicit GameObject(const std::string &pathToMesh);
 
-    explicit GameObject(Mesh &mesh);
+    explicit GameObject(Mesh *mesh);
 
     int loadMesh(const std::string& path);
 
 
-    Mesh mesh;
+    Mesh* mesh{};
     Renderer renderer;
     Transform transform;
     GLuint textureID{};

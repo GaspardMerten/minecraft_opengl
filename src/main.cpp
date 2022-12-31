@@ -22,6 +22,8 @@
 #include "utils/world/generate_world.h"
 #include "texture/manager/TextureManager.h"
 #include "controls/camera/CameraControls.h"
+#include "game/Minecraft.h"
+#include "objects/mesh/manager/MeshManager.h"
 
 #define SHADER_PATH "shaders/"
 
@@ -29,7 +31,7 @@ const int width = 500;
 const int height = 500;
 
 
-Shader loadShader(const std::string &vertexPath, const std::string &fragmentPath, bool withTexture = true);
+Shader loadShader(const std::string &vertexPath, const std::string &fragmentPath, bool withTexture = true, bool withLight = true);
 
 #ifndef NDEBUG
 
@@ -159,43 +161,22 @@ int main(int argc, char *argv[]) {
     }
 #endif
 
-
     const glm::vec3 light_pos = glm::vec3(0.5, 0.5, -0.7);
 
-
-    double prev = 0;
-    int deltaFrame = 0;
+    MeshManager::linkMesh(MeshType::BLOCK, "resources/objects/cube.obj");
+    MeshManager::linkMesh(MeshType::HUMAN, "resources/objects/stevy.obj");
 
     TextureManager::linkTexture(TextureType::DIRT, "resources/textures/dirt.jpg");
     TextureManager::linkTexture(TextureType::PLAYER, "resources/textures/steve.jpg");
 
-    Shader shadowShader = loadShader("shadow.vert.glsl", "shadow.frag.glsl", false);
+    auto* minecraft = new Minecraft(50, 50, 1, glm::vec3(15, 1, 15), window);
+
+
+    Shader shadowShader = loadShader("shadow.vert.glsl", "shadow.frag.glsl", false, false);
     Shader shader = loadShader("vertex.glsl", "fragment.glsl");
-    shader.use();
+    minecraft->linkShader(shader);
+    minecraft->linkShader(shadowShader);
 
-    auto *player = new GameObject("resources/objects/stevy.obj");
-    auto *player2 = new GameObject("resources/objects/stevy.obj");
-    player->makeObject(shader);
-    player2->makeObject(shader);
-    player->makeObject(shadowShader);
-    player2->makeObject(shadowShader);
-    player->setTextureID(TextureManager::getTextureID(TextureType::PLAYER));
-    player2->setTextureID(TextureManager::getTextureID(TextureType::PLAYER));
-
-    Camera camera = Camera(player->transform);
-
-    glm::mat4 view = camera.getViewMatrix();
-    glm::mat4 perspective = camera.getProjectionMatrix();
-
-    player->transform.position = glm::vec3(10, 1, 10);
-    player2->transform.position = glm::vec3(20, 1, 20);
-    player2->transform.setRotationY(90);
-    // Adding texture to cube
-
-    auto *cube = new GameObject("resources/objects/cube.obj");
-    cube->makeObject(shader);
-    cube->makeObject(shadowShader);
-    cube->setTextureID(TextureManager::getTextureID(TextureType::DIRT));
 
     glfwSwapInterval(1);
 
@@ -204,32 +185,6 @@ int main(int argc, char *argv[]) {
     double prevY = 0;
 
     glfwGetCursorPos(window, &prevX, &prevY);
-
-    Light light(
-            shader,
-            glm::vec3(34, 20, 66),
-            glm::vec3(0.0, 0.0, 0.0),
-            0.9,
-            0.8,
-            10.5,
-            32.0,
-            0.14,
-            0.01,
-            1.0
-    );
-    light.init();
-
-    World world = generateFlatWorld(100, 100, 1);
-    world.instantiateObjects("resources/objects/cube.obj");
-    world.makeObjects(shader);
-
-    PlayerControls controls = PlayerControls(player->transform, camera, world);
-    CameraControls cameraControls = CameraControls(camera, window);
-    //2. Use the shader Class to send the uniform
-    glm::mat4 model = glm::mat4(1.0);
-    model = glm::translate(model, glm::vec3(1.0, 1.0, 2.0));
-    model = glm::scale(model, glm::vec3(1.2, 1.2, 1.2));
-    light.use(camera, model);
 
 
     /**
@@ -258,52 +213,46 @@ int main(int argc, char *argv[]) {
     float near_plane = 1.0f, far_plane = 7.5f;
     glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
 
-    glm::mat4 lightView = glm::lookAt(glm::vec3(0.0f, 10.0f, 0.0f),
-                                      glm::vec3(0.0f, 0.0f, 0.0f),
-                                      glm::vec3(0.0f, 1.0f, 0.0f));
-
-    glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
     glDepthFunc(GL_LESS);
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
+
     while (!glfwWindowShouldClose(window)) {
-        controls.processEvents(window);
+        minecraft->processEvents(window);
 
         int width, height;
 
-        view = camera.getViewMatrix();
         glfwPollEvents();
 
         glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
         glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
         glClear(GL_DEPTH_BUFFER_BIT);
         shadowShader.use();
-        shadowShader.setMatrix4("V", view);
-        shadowShader.setMatrix4("P", perspective);
-        shadowShader.setMatrix4("lightSpaceMatrix", lightSpaceMatrix);
+        minecraft->configureMatrices(shadowShader);
+        shadowShader.setMatrix4("lightSpaceMatrix", minecraft->light->getSpaceMatrix());
         glCullFace(GL_FRONT);
-        cube->draw(shadowShader);
-        world.draw(shadowShader);
-        player->draw(shadowShader);
-        player2->draw(shadowShader);
+        minecraft->render(shadowShader);
         glCullFace(GL_BACK);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glActiveTexture(GL_TEXTURE0 + 2);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
+
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glfwGetFramebufferSize(window, &width, &height);
         glViewport(0, 0, width, height);
 
+
+
+
         shader.use();
-        shader.setMatrix4("V", view);
-        shader.setMatrix4("P", perspective);
+        shader.setMatrix4("lightSpaceMatrix", minecraft->light->getSpaceMatrix());
+        minecraft->configureMatrices(shader);
         glBindTexture(GL_TEXTURE_2D, depthMap);
-        cube->draw(shader);
-        world.draw(shader);
-        player->draw(shader);
-        player2->draw(shader);
+        minecraft->render(shader);
 
 
         // get current mouse position
@@ -327,12 +276,12 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-Shader loadShader(const std::string &vertexPath, const std::string &fragmentPath, bool withTexture) {
+Shader loadShader(const std::string &vertexPath, const std::string &fragmentPath, bool withTexture,bool withLight) {
     // join folder path with shader file name (platform independent)
     std::string vertexShaderPath = SHADER_PATH + vertexPath;
     std::string fragmentShaderPath = SHADER_PATH + fragmentPath;
 
-    return {vertexShaderPath, fragmentShaderPath, withTexture};
+    return {vertexShaderPath, fragmentShaderPath, withTexture, withLight};
 }
 
 

@@ -3,7 +3,7 @@
 #include "glm/gtc/type_ptr.hpp"
 
 
-Shader::Shader(std::string &vertexShaderPath, std::string &fragmentShaderPath, bool withTexture) : withTexture(withTexture) {
+Shader::Shader(std::string &vertexShaderPath, std::string &fragmentShaderPath, bool withTexture, bool withLight) : withTexture(withTexture), withLight(withLight) {
     GLuint shaderV;
     GLuint shaderF;
 
@@ -75,5 +75,9 @@ GLuint Shader::compileProgram(GLuint vertexShader, GLuint fragmentShader) {
         std::cout << "ERROR::PROGRAM_LINKING_ERROR:  " << infoLog << std::endl;
     }
     return programID;
+}
+
+void Shader::set1i(const GLchar *name, GLint value) const {
+    glUniform1i(glGetUniformLocation(ID, name), value);
 }
 
