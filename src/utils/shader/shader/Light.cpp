@@ -26,6 +26,8 @@ void Light::init() {
     shader.setFloat("light.constant", constant);
     shader.setFloat("light.linear", linear);
     shader.setFloat("light.quadratic", quadratic);
+    shader.setVector3f("light.light_pos", position);
+
 }
 
 void Light::use(Camera & camera, glm::mat4 model) const {

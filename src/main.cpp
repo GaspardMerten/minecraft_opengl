@@ -160,7 +160,8 @@ int main(int argc, char *argv[]) {
 #endif
 
 
-    const glm::vec3 light_pos = glm::vec3(0.5, 0.5, -0.7);
+
+
 
 
     double prev = 0;
@@ -204,10 +205,11 @@ int main(int argc, char *argv[]) {
     double prevY = 0;
 
     glfwGetCursorPos(window, &prevX, &prevY);
+    const glm::vec3 light_pos = glm::vec3(40, 10, 5);
 
     Light light(
             shader,
-            glm::vec3(34, 20, 66),
+            light_pos,
             glm::vec3(0.0, 0.0, 0.0),
             0.9,
             0.8,
