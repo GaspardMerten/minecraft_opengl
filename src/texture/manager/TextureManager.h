@@ -16,7 +16,7 @@ enum TextureType {
     WOOD,
     LEAF,
     WHITE_SHEEP,
-    GLOW_STONE, BROWN_VILLAGER
+    GLOW_STONE, BROWN_VILLAGER, GRASS
 };
 
 

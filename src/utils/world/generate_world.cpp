@@ -12,15 +12,15 @@ World* generateFlatWorld(int length, int width, int depth, int nbrTrees) {
     for (int i = 0; i < length; i++) {
         for (int j = 0; j < width; j++) {
             for (int k = 0; k < depth; k++) {
-                map[std::make_tuple(i, j, -k)] = std::make_tuple(1, MeshType::BLOCK, TextureType::DIRT);
+                map[std::make_tuple(i, j, -k)] = std::make_tuple(1, MeshType::CUBEMAP, TextureType::GRASS);
             }
         }
     }
 
     // add higher blocks only  on the edges
     for (int i = 0; i < length; i++) {
-        map[std::make_tuple(i, width, 1)] = std::make_tuple(1, MeshType::BLOCK, TextureType::DIRT);;
-        map[std::make_tuple(i, 0, 1)] = std::make_tuple(1, MeshType::BLOCK, TextureType::DIRT);;
+        map[std::make_tuple(i, width, 1)] = std::make_tuple(1, MeshType::CUBEMAP, TextureType::GRASS);;
+        map[std::make_tuple(i, 0, 1)] = std::make_tuple(1, MeshType::CUBEMAP, TextureType::GRASS);;
     }
     // add higher blocks only  on the edges
     for (int i = 0; i < width; i++) {

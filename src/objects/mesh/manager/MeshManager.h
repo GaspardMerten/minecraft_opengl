@@ -14,17 +14,16 @@
 enum MeshType {
     HUMAN,
     BLOCK,
-    SHEEP, VILLAGER
+    SHEEP, VILLAGER, CUBEMAP
 };
 
 
-
 class MeshManager {
-    static std::map<MeshType, Mesh*> meshes;
+    static std::map<MeshType, Mesh *> meshes;
 public:
-    static void linkMesh(MeshType type, const char* path);
+    static void linkMesh(MeshType type, const char *path);
 
-    static Mesh* getMesh(MeshType type);
+    static Mesh *getMesh(MeshType type);
 };
 
 
