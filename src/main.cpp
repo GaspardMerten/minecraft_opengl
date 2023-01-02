@@ -166,8 +166,12 @@ int main(int argc, char *argv[]) {
     MeshManager::linkMesh(MeshType::BLOCK, "resources/objects/cube.obj");
     MeshManager::linkMesh(MeshType::HUMAN, "resources/objects/stevy.obj");
 
+
     TextureManager::linkTexture(TextureType::DIRT, "resources/textures/dirt.jpg");
+    TextureManager::linkTexture(TextureType::WOOD, "resources/textures/wood.jpg");
+    TextureManager::linkTexture(TextureType::LEAF, "resources/textures/leaf.jpeg");
     TextureManager::linkTexture(TextureType::PLAYER, "resources/textures/steve.jpg");
+
 
     auto* minecraft = new Minecraft(50, 50, 1, glm::vec3(15, 1, 15), window);
 

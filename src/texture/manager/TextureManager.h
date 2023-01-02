@@ -12,7 +12,10 @@
 
 enum TextureType {
     DIRT,
-    PLAYER
+    PLAYER,
+    WOOD,
+    LEAF
+
 };
 
 

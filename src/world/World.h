@@ -11,15 +11,17 @@
 #include "glm/fwd.hpp"
 #include "glm/detail/type_mat3x3.hpp"
 #include "../objects/game_object/GameObject.h"
+#include "../objects/mesh/manager/MeshManager.h"
+#include "../texture/manager/TextureManager.h"
 
 class World {
 public:
 
-    explicit World(std::map<std::tuple<int, int, int>, int> map);
+    explicit World(std::map<std::tuple<int, int, int>, std::tuple<int, MeshType, TextureType>> map);
 
     std::map<std::tuple<int, int, int>, GameObject*> worldBlockInstances;
 public:
-    std::map<std::tuple<int, int, int>, int> worldBlocks;
+    std::map<std::tuple<int, int, int>, std::tuple<int, MeshType, TextureType>> worldBlocks;
 
     void create();
 
