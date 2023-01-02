@@ -25,7 +25,7 @@ class Minecraft {
     CameraControls *cameraControls;
     PlayerControls *playerControls;
 public:
-    Minecraft(int width, int height, int depth, glm::vec3 playerSpawn, GLFWwindow *window);
+    Minecraft(int width, int height, int depth, int nbrTrees, glm::vec3 playerSpawn, GLFWwindow *window);
 
     void linkShader(Shader &shader);
 
