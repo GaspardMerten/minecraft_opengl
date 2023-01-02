@@ -166,6 +166,7 @@ int main(int argc, char *argv[]) {
     MeshManager::linkMesh(MeshType::BLOCK, "resources/objects/cube.obj");
     MeshManager::linkMesh(MeshType::HUMAN, "resources/objects/stevy.obj");
     MeshManager::linkMesh(MeshType::SHEEP, "resources/objects/sheep/sheep.obj");
+    MeshManager::linkMesh(MeshType::VILLAGER, "resources/objects/villager.obj");
 
 
     TextureManager::linkTexture(TextureType::DIRT, "resources/textures/dirt.jpg");
@@ -174,9 +175,10 @@ int main(int argc, char *argv[]) {
     TextureManager::linkTexture(TextureType::PLAYER, "resources/textures/steve.jpg");
     TextureManager::linkTexture(TextureType::GLOW_STONE, "resources/textures/glowstone.jpg");
     TextureManager::linkTexture(TextureType::WHITE_SHEEP, "resources/textures/sheep.jpg");
+    TextureManager::linkTexture(TextureType::BROWN_VILLAGER, "resources/textures/villager.jpg");
 
 
-    auto* minecraft = new Minecraft(150, 100, 1,50, glm::vec3(15, 1, 15), window);
+    auto* minecraft = new Minecraft(150, 100, 1,100, glm::vec3(15, 1, 15), window);
 
 
     Shader shadowShader = loadShader("shadow.vert.glsl", "shadow.frag.glsl", false, false);

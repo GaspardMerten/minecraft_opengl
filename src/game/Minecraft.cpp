@@ -16,21 +16,42 @@ Minecraft::Minecraft(int width, int height, int depth, int nbrTrees, glm::vec3 p
     player->setTextureID(TextureManager::getTextureID(TextureType::PLAYER));
     player->transform.setPosition(playerSpawn.x, playerSpawn.y, playerSpawn.z);
     player->collider = Collider{0.1f, 0.1f, 0.5f};
-    physicsManager->linkGameObject(player);
     camera = new Camera(player->transform);
     cameraControls = new CameraControls(*camera, window);
     playerControls = new PlayerControls(player, *camera, *world);
 
-    for (int i = 0; i < 10; i++) {
+    double size = 0.6;
+
+    for (int i = 0; i < 15; i++) {
+        if (i > 10) {
+            size = 0.3;
+        }
         auto* sheep = new GameObject(MeshManager::getMesh(MeshType::SHEEP));
         sheep->setTextureID(TextureManager::getTextureID(TextureType::WHITE_SHEEP));
         sheep->transform.setPosition(10, 1, 10);
-        sheep->transform.setScale(0.6, 0.6, 0.6);
+        sheep->transform.setScale(size, size, size);
         sheep->collider = Collider{2.0f, 2.0f, 0.5f};
+        physicsManager->linkGameObject(sheep);
         pnjManager->addPNJ(sheep, {1, 50, 0.1});
         toRender.push_back(sheep);
-
     }
+
+    size = 2;
+    for (int i = 0; i < 15; i++) {
+        if (i > 10) {
+            size = 1.5;
+        }
+        auto* sheep = new GameObject(MeshManager::getMesh(MeshType::VILLAGER));
+        sheep->setTextureID(TextureManager::getTextureID(TextureType::BROWN_VILLAGER));
+        sheep->transform.setPosition(10, 1, 10);
+        sheep->transform.setScale(size, size, size);
+        sheep->collider = Collider{2.0f, 2.0f, 0.5f};
+        physicsManager->linkGameObject(sheep);
+        pnjManager->addPNJ(sheep, {1, 50, 0.1});
+        toRender.push_back(sheep);
+    }
+
+
 
 
     auto* cube = new GameObject(MeshManager::getMesh(MeshType::BLOCK));
@@ -50,6 +71,8 @@ Minecraft::Minecraft(int width, int height, int depth, int nbrTrees, glm::vec3 p
     );
 
     cube->transform.setPosition(22, 10, 40);
+    physicsManager->linkGameObject(player);
+
 }
 
 void Minecraft::render(Shader &shader) {

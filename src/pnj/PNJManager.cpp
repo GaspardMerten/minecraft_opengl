@@ -15,6 +15,10 @@ void PNJManager::update() {
         GameObject *gameObject = gameObjectAndData.first;
         PNJData data = gameObjectAndData.second;
 
+        if ((float)rand() / (float)RAND_MAX > 0.995 && gameObject->physicsData.velocity == 0) {
+            gameObject->physicsData.acceleration = 0.06;
+        }
+
         if (destinations.count(gameObject)) {
             double distance = glm::distance(gameObject->transform.position, destinations[gameObject]);
 
