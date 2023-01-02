@@ -170,7 +170,7 @@ int main(int argc, char *argv[]) {
 
     TextureManager::linkTexture(TextureType::DIRT, "resources/textures/dirt.jpg");
     TextureManager::linkTexture(TextureType::WOOD, "resources/textures/wood.jpg");
-    TextureManager::linkTexture(TextureType::LEAF, "resources/textures/leaf.jpeg");
+    TextureManager::linkTexture(TextureType::LEAF, "resources/textures/leaves.jpg");
     TextureManager::linkTexture(TextureType::PLAYER, "resources/textures/steve.jpg");
     TextureManager::linkTexture(TextureType::GLOW_STONE, "resources/textures/glowstone.jpg");
     TextureManager::linkTexture(TextureType::WHITE_SHEEP, "resources/textures/sheep.jpg");
