@@ -17,7 +17,7 @@ class PlayerControls {
     World& world;
     Camera& camera;
 
-    float speed = 0.12;
+    float speed = 0.5;
     float mouseSensitivity = 0.05;
 
     double lastX = 0;
