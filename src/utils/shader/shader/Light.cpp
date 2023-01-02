@@ -30,7 +30,7 @@ void Light::linkShader(Shader& shader) const {
     shader.setFloat("light.constant", constant);
     shader.setFloat("light.linear", linear);
     shader.setFloat("light.quadratic", quadratic);
-    shader.setVector3f("light.light_pos", position);
+    shader.setVector3f("light.light_pos", transform->position);
 
 }
 

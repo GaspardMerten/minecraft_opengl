@@ -22,8 +22,6 @@ class Minecraft {
 
     World *world;
 
-    GameObject *player;
-
     CameraControls *cameraControls;
     PlayerControls *playerControls;
 public:
@@ -40,6 +38,8 @@ public:
 
     Camera *camera;
     Light *light;
+    GameObject *player;
+    std::vector<GameObject*> toRender = std::vector<GameObject*>();
 };
 
 

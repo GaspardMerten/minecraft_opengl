@@ -17,17 +17,23 @@ Minecraft::Minecraft(int width, int height, int depth, glm::vec3 playerSpawn, GL
     cameraControls = new CameraControls(*camera, window);
     playerControls = new PlayerControls(player->transform, *camera, *world);
 
+    auto* cube = new GameObject(MeshManager::getMesh(MeshType::BLOCK));
+    cube->setTextureID(TextureManager::getTextureID(TextureType::GLOW_STONE));
+    toRender.push_back(cube);
+
     light = new Light(
-            glm::vec3(34, 20, 66),
+            glm::vec3(22, 10, 40),
             glm::vec3(0.0, 0.0, 0.0),
             0.9,
             0.8,
-            10.5,
-            32.0,
+            0.5,
+            5.0,
             0.14,
             0.01,
             1.0
     );
+
+    cube->transform.setPosition(22, 10, 40);
 }
 
 void Minecraft::render(Shader &shader) {
@@ -41,11 +47,17 @@ void Minecraft::render(Shader &shader) {
 
     world->draw(shader);
     player->draw(shader);
+    for (auto &gameObject : toRender) {
+        gameObject->draw(shader);
+    }
 }
 
 void Minecraft::linkShader(Shader &shader) {
     world->makeObjects(shader);
     player->makeObject(shader);
+    for (auto &gameObject : toRender) {
+        gameObject->makeObject(shader);
+    }
 }
 
 void Minecraft::processEvents(GLFWwindow *window) {
