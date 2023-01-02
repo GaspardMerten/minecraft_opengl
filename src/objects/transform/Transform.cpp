@@ -107,3 +107,7 @@ glm::vec3 Transform::getPosition() {
 Transform::Transform() {
     this->model = glm::mat4(1.0);
 }
+
+void Transform::translatePure(float d, float d1, float d2) {
+    setPosition(position.x + d, position.y + d1, position.z + d2);
+}

@@ -236,13 +236,8 @@ int main(int argc, char *argv[]) {
 
         glm::vec4 computed = lightSpaceMatrix*minecraft->player->transform.getModel()*glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
-      if (n%100 == 0) {
-          // print computed
-          std::cout << computed.x << " " << computed.y << " " << computed.z << " " << computed.w << std::endl;
-          // print player position
-          std::cout << minecraft->player->transform.position.x << " " << minecraft->player->transform.position.y << " "
-                    << minecraft->player->transform.position.z << std::endl;
-      }
+        minecraft->updateManagers();
+
         int width, height;
 
         glfwPollEvents();

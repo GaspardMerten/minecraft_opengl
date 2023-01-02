@@ -8,8 +8,11 @@
 
 #include <utility>
 
-World::World(std::map<std::tuple<int, int, int>, int> map) {
+World::World(std::map<std::tuple<int, int, int>, int> map, int width, int length, int depth) {
     worldBlocks = std::move(map);
+    this->width = width;
+    this->length = length;
+    this->depth = depth;
 }
 
 void World::create() {

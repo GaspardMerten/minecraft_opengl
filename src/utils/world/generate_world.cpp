@@ -28,5 +28,5 @@ World* generateFlatWorld(int length, int width, int depth) {
         map[std::make_tuple(0, i, 1)] = 1;
     }
 
-    return new World(map);
+    return new World(map, length, width, depth);
 }

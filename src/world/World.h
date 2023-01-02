@@ -14,12 +14,15 @@
 
 class World {
 public:
-
-    explicit World(std::map<std::tuple<int, int, int>, int> map);
+    World(std::map<std::tuple<int, int, int>, int> map, int width, int length, int depth);
 
     std::map<std::tuple<int, int, int>, GameObject*> worldBlockInstances;
 public:
     std::map<std::tuple<int, int, int>, int> worldBlocks;
+
+    int width;
+    int length;
+    int depth;
 
     void create();
 
