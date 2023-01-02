@@ -7,25 +7,52 @@
 
 
 World* generateFlatWorld(int length, int width, int depth) {
-    std::map<std::tuple<int, int, int>, int> map;
+    std::map<std::tuple<int, int, int>, std::tuple<int, MeshType, TextureType>> map;
 
     for (int i = 0; i < length; i++) {
         for (int j = 0; j < width; j++) {
             for (int k = 0; k < depth; k++) {
-                map[std::make_tuple(i, j, -k)] = 1;
+                map[std::make_tuple(i, j, -k)] = std::make_tuple(1, MeshType::BLOCK, TextureType::DIRT);
             }
         }
     }
 
     // add higher blocks only  on the edges
     for (int i = 0; i < length; i++) {
-        map[std::make_tuple(i, width, 1)] = 1;
-        map[std::make_tuple(i, 0, 1)] = 1;
+        map[std::make_tuple(i, width, 1)] = std::make_tuple(1, MeshType::BLOCK, TextureType::DIRT);;
+        map[std::make_tuple(i, 0, 1)] = std::make_tuple(1, MeshType::BLOCK, TextureType::DIRT);;
     }
     // add higher blocks only  on the edges
     for (int i = 0; i < width; i++) {
-        map[std::make_tuple(length, i, 1)] = 1;
-        map[std::make_tuple(0, i, 1)] = 1;
+        map[std::make_tuple(length, i, 1)] = std::make_tuple(1, MeshType::BLOCK, TextureType::DIRT);;
+        map[std::make_tuple(0, i, 1)] = std::make_tuple(1,MeshType::BLOCK, TextureType::DIRT);;
+    }
+
+    // add little trees randomly
+    for (int i = 0; i < 10; i++) {
+        int x = rand() % length;
+        int y = rand() % width;
+        for(int j = 0; j < 5; j++) {
+            map[std::make_tuple(x, y, j)] = std::make_tuple(1, MeshType::BLOCK, TextureType::WOOD);;
+        }
+
+        // Leaves
+        for(int j = 0; j < 6; j++) {
+            for(int k = 0; k < 6; k++) {
+                map[std::make_tuple(x - 2 + j, y - 2 + k, 5)] = std::make_tuple(1, MeshType::BLOCK, TextureType::LEAF);;
+            }
+        }
+        for(int j = 0; j < 4; j++) {
+            for(int k = 0; k < 4; k++) {
+                map[std::make_tuple(x - 1 + j, y - 1 + k, 6)] = std::make_tuple(1, MeshType::BLOCK, TextureType::LEAF);;
+            }
+        }
+        for(int j = 0; j < 2; j++) {
+            for(int k = 0; k < 2; k++) {
+                map[std::make_tuple(x + j, y + k, 7)] = std::make_tuple(1, MeshType::BLOCK, TextureType::LEAF);;
+            }
+        }
+
     }
 
     return new World(map, length, width, depth);

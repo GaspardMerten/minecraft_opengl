@@ -167,10 +167,14 @@ int main(int argc, char *argv[]) {
     MeshManager::linkMesh(MeshType::HUMAN, "resources/objects/stevy.obj");
     MeshManager::linkMesh(MeshType::SHEEP, "resources/objects/sheep/sheep.obj");
 
+
     TextureManager::linkTexture(TextureType::DIRT, "resources/textures/dirt.jpg");
+    TextureManager::linkTexture(TextureType::WOOD, "resources/textures/wood.jpg");
+    TextureManager::linkTexture(TextureType::LEAF, "resources/textures/leaf.jpeg");
     TextureManager::linkTexture(TextureType::PLAYER, "resources/textures/steve.jpg");
     TextureManager::linkTexture(TextureType::GLOW_STONE, "resources/textures/glowstone.jpg");
     TextureManager::linkTexture(TextureType::WHITE_SHEEP, "resources/textures/sheep.jpg");
+
 
     auto* minecraft = new Minecraft(50, 50, 1, glm::vec3(15, 1, 15), window);
 

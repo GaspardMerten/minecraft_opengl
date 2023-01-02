@@ -8,20 +8,15 @@
 
 #include <utility>
 
-World::World(std::map<std::tuple<int, int, int>, int> map, int width, int length, int depth) {
+World::World(std::map<std::tuple<int, int, int>, std::tuple<int, MeshType, TextureType>> map) {
     worldBlocks = std::move(map);
-    this->width = width;
-    this->length = length;
-    this->depth = depth;
 }
 
 void World::create() {
-    GLuint textureId = TextureManager::getTextureID(TextureType::DIRT);
-    auto mesh = MeshManager::getMesh(MeshType::BLOCK);
 
     for (auto &worldBlock : worldBlocks) {
-        worldBlockInstances[worldBlock.first] = new GameObject(mesh);
-        worldBlockInstances[worldBlock.first]->setTextureID(textureId);
+        worldBlockInstances[worldBlock.first] = new GameObject(MeshManager::getMesh(std::get<1>(worldBlock.second)));
+        worldBlockInstances[worldBlock.first]->setTextureID(TextureManager::getTextureID(std::get<2>(worldBlock.second)));
         worldBlockInstances[worldBlock.first]->transform.setPosition(std::get<0>(worldBlock.first), std::get<2>(worldBlock.first), std::get<1>(worldBlock.first));
     }
 }

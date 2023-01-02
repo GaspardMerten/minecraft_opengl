@@ -45,8 +45,8 @@ void PlayerControls::processEvents(GLFWwindow *window) {
         }
     }
 
-    if (world.worldBlocks[std::tuple<int, int, int>(transform.position.x, transform.position.z,
-                                                    transform.position.y+0.5)] == 1) {
+    if (std::get<0>(world.worldBlocks[std::tuple<int, int, int>(transform.position.x, transform.position.z,
+                                                    transform.position.y+0.5)]) == 1) {
         transform.position = oldPosition;
     }
 }
