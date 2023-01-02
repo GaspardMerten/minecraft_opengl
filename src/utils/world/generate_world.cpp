@@ -37,21 +37,18 @@ World* generateFlatWorld(int length, int width, int depth) {
         }
 
         // Leaves
-        for(int j = 0; j < 6; j++) {
-            for(int k = 0; k < 6; k++) {
+        for(int j = 0; j < 5; j++) {
+            for(int k = 0; k < 5; k++) {
                 map[std::make_tuple(x - 2 + j, y - 2 + k, 5)] = std::make_tuple(1, MeshType::BLOCK, TextureType::LEAF);;
             }
         }
-        for(int j = 0; j < 4; j++) {
-            for(int k = 0; k < 4; k++) {
+        for(int j = 0; j < 3; j++) {
+            for(int k = 0; k < 3; k++) {
                 map[std::make_tuple(x - 1 + j, y - 1 + k, 6)] = std::make_tuple(1, MeshType::BLOCK, TextureType::LEAF);;
             }
         }
-        for(int j = 0; j < 2; j++) {
-            for(int k = 0; k < 2; k++) {
-                map[std::make_tuple(x + j, y + k, 7)] = std::make_tuple(1, MeshType::BLOCK, TextureType::LEAF);;
-            }
-        }
+        map[std::make_tuple(x, y, 7)] = std::make_tuple(1, MeshType::BLOCK, TextureType::LEAF);;
+
 
     }
 
