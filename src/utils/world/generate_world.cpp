@@ -52,5 +52,5 @@ World* generateFlatWorld(int length, int width, int depth, int nbrTrees) {
 
     }
 
-    return new World(map);
+    return new World(map, length, width, depth);
 }

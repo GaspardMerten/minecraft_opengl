@@ -12,18 +12,18 @@
 #include "../controls/camera/CameraControls.h"
 #include "../controls/player_controls/PlayerControls.h"
 #include "../utils/shader/shader/Light.h"
+#include "../pnj/PNJManager.h"
 
 class Minecraft {
-    int width{};
-    int height{};
-    int depth{};
-
     glm::vec3 playerSpawn{};
 
     World *world;
 
-    CameraControls *cameraControls;
     PlayerControls *playerControls;
+
+    CameraControls *cameraControls;
+
+    PNJManager *pnjManager;
 public:
     Minecraft(int width, int height, int depth, int nbrTrees, glm::vec3 playerSpawn, GLFWwindow *window);
 
@@ -33,8 +33,9 @@ public:
 
     void processEvents(GLFWwindow *window);
 
-
     void configureMatrices(Shader &shader) const;
+
+    void updateManagers();
 
     Camera *camera;
     Light *light;

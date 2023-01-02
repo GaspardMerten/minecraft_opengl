@@ -10,6 +10,7 @@
 Minecraft::Minecraft(int width, int height, int depth, int nbrTrees, glm::vec3 playerSpawn, GLFWwindow *window) : world(
         generateFlatWorld(width, height, depth, nbrTrees)) {
     world->create();
+    pnjManager = new PNJManager(world);
     player = new GameObject(MeshManager::getMesh(MeshType::HUMAN));
     player->setTextureID(TextureManager::getTextureID(TextureType::PLAYER));
     player->transform.setPosition(playerSpawn.x, playerSpawn.y, playerSpawn.z);
@@ -22,6 +23,7 @@ Minecraft::Minecraft(int width, int height, int depth, int nbrTrees, glm::vec3 p
     sheep->setTextureID(TextureManager::getTextureID(TextureType::WHITE_SHEEP));
     sheep->transform.setPosition(10, 1, 10);
     sheep->transform.setScale(0.6, 0.6, 0.6);
+    pnjManager->addPNJ(sheep, {1, 50, 0.1});
     auto* cube = new GameObject(MeshManager::getMesh(MeshType::BLOCK));
     cube->setTextureID(TextureManager::getTextureID(TextureType::GLOW_STONE));
     toRender.push_back(cube);
@@ -73,4 +75,8 @@ void Minecraft::processEvents(GLFWwindow *window) {
 void Minecraft::configureMatrices(Shader &shader) const {
     shader.setMatrix4("V", camera->getViewMatrix());
     shader.setMatrix4("P", camera->getProjectionMatrix());
+}
+
+void Minecraft::updateManagers() {
+    pnjManager->update();
 }

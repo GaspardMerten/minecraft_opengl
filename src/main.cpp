@@ -170,13 +170,13 @@ int main(int argc, char *argv[]) {
 
     TextureManager::linkTexture(TextureType::DIRT, "resources/textures/dirt.jpg");
     TextureManager::linkTexture(TextureType::WOOD, "resources/textures/wood.jpg");
-    TextureManager::linkTexture(TextureType::LEAF, "resources/textures/leaf.jpeg");
+    TextureManager::linkTexture(TextureType::LEAF, "resources/textures/leaves.jpg");
     TextureManager::linkTexture(TextureType::PLAYER, "resources/textures/steve.jpg");
     TextureManager::linkTexture(TextureType::GLOW_STONE, "resources/textures/glowstone.jpg");
     TextureManager::linkTexture(TextureType::WHITE_SHEEP, "resources/textures/sheep.jpg");
 
 
-    auto* minecraft = new Minecraft(50, 50, 1, glm::vec3(15, 1, 15), window);
+    auto* minecraft = new Minecraft(100, 100, 1, glm::vec3(15, 1, 15), window);
 
 
     Shader shadowShader = loadShader("shadow.vert.glsl", "shadow.frag.glsl", false, false);
@@ -240,13 +240,8 @@ int main(int argc, char *argv[]) {
 
         glm::vec4 computed = lightSpaceMatrix*minecraft->player->transform.getModel()*glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
-      if (n%100 == 0) {
-          // print computed
-          std::cout << computed.x << " " << computed.y << " " << computed.z << " " << computed.w << std::endl;
-          // print player position
-          std::cout << minecraft->player->transform.position.x << " " << minecraft->player->transform.position.y << " "
-                    << minecraft->player->transform.position.z << std::endl;
-      }
+        minecraft->updateManagers();
+
         int width, height;
 
         glfwPollEvents();
