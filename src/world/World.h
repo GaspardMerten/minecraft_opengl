@@ -30,6 +30,8 @@ public:
 
     void makeObjects(Shader &shader);
 
+    bool collides(GameObject* object);
+
     GameObject *getBlockAt(glm::vec3 &vec);
 };
 

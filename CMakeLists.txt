@@ -12,7 +12,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 find_package(OpenGL REQUIRED)
 
 #for glad library
-add_library( glad STATIC 3rdParty/glad/src/glad.c src/objects/game_object/GameObject.cpp src/objects/game_object/GameObject.h src/texture/texture/Texture.cpp src/texture/texture/Texture.h)
+add_library( glad STATIC 3rdParty/glad/src/glad.c src/objects/game_object/GameObject.cpp src/objects/game_object/GameObject.h src/texture/texture/Texture.cpp src/texture/texture/Texture.h src/objects/collider/Collider.h)
 set(GLAD_INCLUDE "3rdParty/glad/include")
 target_include_directories(glad PUBLIC ${GLAD_INCLUDE})
 

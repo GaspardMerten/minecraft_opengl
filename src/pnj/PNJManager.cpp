@@ -33,7 +33,7 @@ void PNJManager::update() {
                 waiting.erase(gameObject);
                 destinations[gameObject] = glm::vec3(rand() % world->width, 1, rand() % world->length);
                 glm::vec3 direction = glm::normalize(destinations[gameObject] - gameObject->transform.position);
-                gameObject->transform.setRotationY(180-atan2(-direction.x, direction.z)*180/M_PI);
+                gameObject->transform.setDirection(direction);
             }
             continue;
         } else {

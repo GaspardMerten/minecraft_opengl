@@ -13,7 +13,7 @@
 
 class PlayerControls {
 
-    Transform& transform;
+    GameObject* player;
     World& world;
     Camera& camera;
 
@@ -23,7 +23,7 @@ class PlayerControls {
     double lastX = 0;
     double lastY = 0;
 public:
-    PlayerControls(Transform &transform, Camera &camera, World& world);
+    PlayerControls(GameObject* transform, Camera &camera, World& world);
 
     void processEvents(GLFWwindow* window);
 

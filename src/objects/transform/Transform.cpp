@@ -111,3 +111,7 @@ Transform::Transform() {
 void Transform::translatePure(float d, float d1, float d2) {
     setPosition(position.x + d, position.y + d1, position.z + d2);
 }
+
+void Transform::setDirection(glm::vec3 direction) {
+    setRotationY(180-atan2(-direction.x, direction.z)*180/M_PI);
+}

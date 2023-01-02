@@ -50,6 +50,8 @@ public:
 
     void setRotationY(double x);
 
+    void setDirection(glm::vec3 direction);
+
     glm::vec3 getPosition();
 
     Transform();

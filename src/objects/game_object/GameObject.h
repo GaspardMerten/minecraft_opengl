@@ -9,6 +9,7 @@
 #include "../transform/Transform.h"
 #include "../mesh/Mesh.h"
 #include "../renderer/Renderer.h"
+#include "../collider/Collider.h"
 
 class GameObject {
 public:
@@ -23,6 +24,7 @@ public:
     Renderer renderer;
     Transform transform;
     GLuint textureID{};
+    Collider collider{};
 
     void setTextureID(GLuint textureID);
 
@@ -30,6 +32,7 @@ public:
 
     void makeObject(Shader& shader);
 
+    void setCollider(Collider newCollider);
 };
 
 

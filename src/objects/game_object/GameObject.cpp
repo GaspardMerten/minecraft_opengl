@@ -36,5 +36,9 @@ void GameObject::setTextureID(GLuint newTextureID) {
     this->textureID = newTextureID;
 }
 
+void GameObject::setCollider(Collider newCollider) {
+    this->collider = newCollider;
+}
+
 
 

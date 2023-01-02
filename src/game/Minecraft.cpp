@@ -14,9 +14,10 @@ Minecraft::Minecraft(int width, int height, int depth, glm::vec3 playerSpawn, GL
     player = new GameObject(MeshManager::getMesh(MeshType::HUMAN));
     player->setTextureID(TextureManager::getTextureID(TextureType::PLAYER));
     player->transform.setPosition(playerSpawn.x, playerSpawn.y, playerSpawn.z);
+    player->collider = Collider{0.1f, 0.1f, 0.5f};
     camera = new Camera(player->transform);
     cameraControls = new CameraControls(*camera, window);
-    playerControls = new PlayerControls(player->transform, *camera, *world);
+    playerControls = new PlayerControls(player, *camera, *world);
 
     auto* sheep = new GameObject(MeshManager::getMesh(MeshType::SHEEP));
 
