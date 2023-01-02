@@ -17,19 +17,25 @@ Minecraft::Minecraft(int width, int height, int depth, glm::vec3 playerSpawn, GL
     cameraControls = new CameraControls(*camera, window);
     playerControls = new PlayerControls(player->transform, *camera, *world);
 
+    auto* sheep = new GameObject(MeshManager::getMesh(MeshType::SHEEP));
+
+    sheep->setTextureID(TextureManager::getTextureID(TextureType::WHITE_SHEEP));
+    sheep->transform.setPosition(10, 1, 10);
+    sheep->transform.setScale(0.6, 0.6, 0.6);
     auto* cube = new GameObject(MeshManager::getMesh(MeshType::BLOCK));
     cube->setTextureID(TextureManager::getTextureID(TextureType::GLOW_STONE));
     toRender.push_back(cube);
+    toRender.push_back(sheep);
 
     light = new Light(
             glm::vec3(22, 10, 40),
             glm::vec3(0.0, 0.0, 0.0),
-            0.9,
+            0.5,
             0.8,
             0.5,
             5.0,
-            0.14,
-            0.01,
+            0.014,
+            0,
             1.0
     );
 

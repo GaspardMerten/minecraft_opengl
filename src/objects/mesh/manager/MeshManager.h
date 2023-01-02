@@ -13,7 +13,8 @@
 
 enum MeshType {
     HUMAN,
-    BLOCK
+    BLOCK,
+    SHEEP,
 };
 
 

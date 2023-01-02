@@ -13,7 +13,8 @@
 enum TextureType {
     DIRT,
     PLAYER,
-    GLOW_STONE
+    GLOW_STONE,
+    WHITE_SHEEP
 };
 
 

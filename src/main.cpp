@@ -165,10 +165,12 @@ int main(int argc, char *argv[]) {
 
     MeshManager::linkMesh(MeshType::BLOCK, "resources/objects/cube.obj");
     MeshManager::linkMesh(MeshType::HUMAN, "resources/objects/stevy.obj");
+    MeshManager::linkMesh(MeshType::SHEEP, "resources/objects/sheep/sheep.obj");
 
     TextureManager::linkTexture(TextureType::DIRT, "resources/textures/dirt.jpg");
     TextureManager::linkTexture(TextureType::PLAYER, "resources/textures/steve.jpg");
     TextureManager::linkTexture(TextureType::GLOW_STONE, "resources/textures/glowstone.jpg");
+    TextureManager::linkTexture(TextureType::WHITE_SHEEP, "resources/textures/sheep.jpg");
 
     auto* minecraft = new Minecraft(50, 50, 1, glm::vec3(15, 1, 15), window);
 
@@ -223,9 +225,9 @@ int main(int argc, char *argv[]) {
 
     float near_plane = 1.0f, far_plane = 7.5f;
     glm::mat4 lightProjection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, near_plane, far_plane);
-    glm::mat4 lightView = glm::lookAt(minecraft->light->transform->position,
-                                      glm::vec3( 25.0f, 1.0f,  25.0f),
-                                      glm::vec3( 0.0f, 1.0f,  0.0f));
+    glm::mat4 lightView = glm::lookAt(minecraft->light->transform->position - glm::vec3(0, 5, 0.f),
+                                      minecraft->light->transform->position- glm::vec3(0.0f, 20.0f, 0.0f),
+                                      glm::vec3( 0.0f, 0.0f,  1.0f));
     glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
     while (!glfwWindowShouldClose(window)) {
