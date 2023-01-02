@@ -21,16 +21,21 @@ Minecraft::Minecraft(int width, int height, int depth, int nbrTrees, glm::vec3 p
     cameraControls = new CameraControls(*camera, window);
     playerControls = new PlayerControls(player, *camera, *world);
 
-    auto* sheep = new GameObject(MeshManager::getMesh(MeshType::SHEEP));
+    for (int i = 0; i < 10; i++) {
+        auto* sheep = new GameObject(MeshManager::getMesh(MeshType::SHEEP));
+        sheep->setTextureID(TextureManager::getTextureID(TextureType::WHITE_SHEEP));
+        sheep->transform.setPosition(10, 1, 10);
+        sheep->transform.setScale(0.6, 0.6, 0.6);
+        sheep->collider = Collider{2.0f, 2.0f, 0.5f};
+        pnjManager->addPNJ(sheep, {1, 50, 0.1});
+        toRender.push_back(sheep);
 
-    sheep->setTextureID(TextureManager::getTextureID(TextureType::WHITE_SHEEP));
-    sheep->transform.setPosition(10, 1, 10);
-    sheep->transform.setScale(0.6, 0.6, 0.6);
-    pnjManager->addPNJ(sheep, {1, 50, 0.1});
+    }
+
+
     auto* cube = new GameObject(MeshManager::getMesh(MeshType::BLOCK));
     cube->setTextureID(TextureManager::getTextureID(TextureType::GLOW_STONE));
     toRender.push_back(cube);
-    toRender.push_back(sheep);
 
     light = new Light(
             glm::vec3(22, 10, 40),

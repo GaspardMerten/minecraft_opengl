@@ -25,13 +25,17 @@ void PNJManager::update() {
                 glm::vec3 direction = glm::normalize(destinations[gameObject] - gameObject->transform.position);
                 glm::vec3 delta = direction * data.speed;
                 gameObject->transform.translatePure(delta.x, delta.y, delta.z);
+                if (world->collides(gameObject)) {
+                    gameObject->transform.translatePure(-delta.x, -delta.y, -delta.z);
+                    destinations.erase(gameObject);
+                }
             }
             continue;
         }  else if (waiting.count(gameObject)) {
             waiting[gameObject]--;
             if (waiting[gameObject] <= 0) {
                 waiting.erase(gameObject);
-                destinations[gameObject] = glm::vec3(rand() % world->width, 1, rand() % world->length);
+                destinations[gameObject] = glm::vec3(rand() % world->length, 1, rand() % world->width);
                 glm::vec3 direction = glm::normalize(destinations[gameObject] - gameObject->transform.position);
                 gameObject->transform.setDirection(direction);
             }
