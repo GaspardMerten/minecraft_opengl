@@ -13,14 +13,16 @@ void PhysicsManager::update() {
 
         data->transform.translate(0, physicsData.velocity, 0);
 
-        if (physicsData.velocity != 0 || physicsData.acceleration != 0) {
-            physicsData.acceleration -= 0.02;
-        }
 
-        if (world->collides(data)) {
+
+
+        if (world->getBlockAt(data->transform.position)) {
             data->transform.translate(0, -physicsData.velocity, 0);
             physicsData.velocity = 0;
             physicsData.acceleration = 0;
+        } else {
+            physicsData.acceleration -= 0.02;
+
         }
     }
 }

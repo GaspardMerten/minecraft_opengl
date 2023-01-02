@@ -13,7 +13,6 @@ void PlayerControls::processEvents(GLFWwindow *window) {
     glm::vec3 oldPosition = player->transform.position;
 
     if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) != GLFW_PRESS) {
-
         if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
             player->transform.translate(-speed, 0, 0);
         }
