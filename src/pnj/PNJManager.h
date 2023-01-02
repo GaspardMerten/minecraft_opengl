@@ -18,7 +18,7 @@ class PNJManager {
 
     World *world{};
 public:
-    PNJManager(World *world);
+    explicit PNJManager(World *world);
     void addPNJ(GameObject* pnj, PNJData data);
     void update();
     void removePNJ(GameObject* pnj);

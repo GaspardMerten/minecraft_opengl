@@ -13,6 +13,7 @@
 #include "../controls/player_controls/PlayerControls.h"
 #include "../utils/shader/shader/Light.h"
 #include "../pnj/PNJManager.h"
+#include "../physics/PhysicsManager.h"
 
 class Minecraft {
     glm::vec3 playerSpawn{};
@@ -24,6 +25,8 @@ class Minecraft {
     CameraControls *cameraControls;
 
     PNJManager *pnjManager;
+
+    PhysicsManager *physicsManager;
 public:
     Minecraft(int width, int height, int depth, int nbrTrees, glm::vec3 playerSpawn, GLFWwindow *window);
 

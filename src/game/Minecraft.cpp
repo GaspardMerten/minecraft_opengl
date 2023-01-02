@@ -11,10 +11,12 @@ Minecraft::Minecraft(int width, int height, int depth, int nbrTrees, glm::vec3 p
         generateFlatWorld(width, height, depth, nbrTrees)) {
     world->create();
     pnjManager = new PNJManager(world);
+    physicsManager = new PhysicsManager(world);
     player = new GameObject(MeshManager::getMesh(MeshType::HUMAN));
     player->setTextureID(TextureManager::getTextureID(TextureType::PLAYER));
     player->transform.setPosition(playerSpawn.x, playerSpawn.y, playerSpawn.z);
     player->collider = Collider{0.1f, 0.1f, 0.5f};
+    physicsManager->linkGameObject(player);
     camera = new Camera(player->transform);
     cameraControls = new CameraControls(*camera, window);
     playerControls = new PlayerControls(player, *camera, *world);
@@ -80,4 +82,5 @@ void Minecraft::configureMatrices(Shader &shader) const {
 
 void Minecraft::updateManagers() {
     pnjManager->update();
+    physicsManager->update();
 }

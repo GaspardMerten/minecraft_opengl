@@ -10,6 +10,7 @@
 #include "../mesh/Mesh.h"
 #include "../renderer/Renderer.h"
 #include "../collider/Collider.h"
+#include "../physics/PhysicsData.h"
 
 class GameObject {
 public:
@@ -25,6 +26,7 @@ public:
     Transform transform;
     GLuint textureID{};
     Collider collider{};
+    PhysicsData physicsData{};
 
     void setTextureID(GLuint textureID);
 
@@ -33,6 +35,8 @@ public:
     void makeObject(Shader& shader);
 
     void setCollider(Collider newCollider);
+
+    void setPhysicsData(PhysicsData newPhysicsData);
 };
 
 

@@ -40,5 +40,9 @@ void GameObject::setCollider(Collider newCollider) {
     this->collider = newCollider;
 }
 
+void GameObject::setPhysicsData(PhysicsData newPhysicsData) {
+    this->physicsData = newPhysicsData;
+}
+
 
 
