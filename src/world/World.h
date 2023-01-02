@@ -29,6 +29,8 @@ public:
     void draw(Shader& shader);
 
     void makeObjects(Shader &shader);
+
+    GameObject *getBlockAt(glm::vec3 &vec);
 };
 
 

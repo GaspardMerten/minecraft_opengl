@@ -40,3 +40,13 @@ void World::draw(Shader &shader) {
         worldBlockInstance.second->draw(shader);
     }
 }
+
+GameObject* World::getBlockAt(glm::vec3 &vec) {
+    const std::map<std::tuple<int, int, int>, GameObject *>::iterator &findIterator = worldBlockInstances.find(
+            std::make_tuple(vec.x, vec.z, vec.y));
+
+    if (findIterator != worldBlockInstances.end()) {
+        return findIterator->second;
+    }
+    return nullptr;
+}

@@ -15,16 +15,16 @@ void PlayerControls::processEvents(GLFWwindow *window) {
     if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) != GLFW_PRESS) {
 
         if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-            transform.translate(-1, 0, 0);
+            transform.translate(-speed, 0, 0);
         }
         if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-            transform.translate(1, 0, 0);
+            transform.translate(speed, 0, 0);
         }
         if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-            transform.translate(0, 0, -1);
+            transform.translate(0, 0, -speed);
         }
         if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-            transform.translate(0, 0, 1);
+            transform.translate(0, 0, speed);
         }
         // space to jump
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
@@ -45,9 +45,31 @@ void PlayerControls::processEvents(GLFWwindow *window) {
         }
     }
 
-    if (std::get<0>(world.worldBlocks[std::tuple<int, int, int>(transform.position.x, transform.position.z,
-                                                    transform.position.y+0.5)]) == 1) {
-        transform.position = oldPosition;
+    glm::vec3 &position = transform.position;
+    std::vector<glm::vec3> collisionBox = {
+            glm::vec3(position.x, position.y, position.z),
+            glm::vec3(position.x, position.y + 1, position.z),
+            glm::vec3(position.x - 0.25, position.y, position.z - 0.25),
+            glm::vec3(position.x + 0.25, position.y, position.z + 0.25),
+            glm::vec3(position.x - 0.25, position.y, position.z + 0.25),
+            glm::vec3(position.x + 0.25, position.y, position.z - 0.25),
+            glm::vec3(position.x - 0.25, position.y + 1, position.z - 0.25),
+            glm::vec3(position.x + 0.25, position.y + 1, position.z + 0.25),
+            glm::vec3(position.x - 0.25, position.y + 1, position.z + 0.25),
+            glm::vec3(position.x + 0.25, position.y + 1, position.z - 0.25),
+    };
+
+    bool didCollide = false;
+
+    for (glm::vec3 &vec : collisionBox) {
+        if (world.getBlockAt(vec) != nullptr) {
+            didCollide = true;
+            break;
+        }
+    }
+
+    if (didCollide) {
+        position = oldPosition;
     }
 }
 

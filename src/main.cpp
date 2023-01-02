@@ -176,7 +176,7 @@ int main(int argc, char *argv[]) {
     TextureManager::linkTexture(TextureType::WHITE_SHEEP, "resources/textures/sheep.jpg");
 
 
-    auto* minecraft = new Minecraft(50, 50, 1, glm::vec3(15, 1, 15), window);
+    auto* minecraft = new Minecraft(100, 100, 1, glm::vec3(15, 1, 15), window);
 
 
     Shader shadowShader = loadShader("shadow.vert.glsl", "shadow.frag.glsl", false, false);
