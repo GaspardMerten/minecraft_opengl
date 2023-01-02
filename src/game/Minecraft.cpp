@@ -7,8 +7,8 @@
 #include "../objects/mesh/manager/MeshManager.h"
 #include "../texture/manager/TextureManager.h"
 
-Minecraft::Minecraft(int width, int height, int depth, glm::vec3 playerSpawn, GLFWwindow *window) : world(
-        generateFlatWorld(width, height, depth)) {
+Minecraft::Minecraft(int width, int height, int depth, int nbrTrees, glm::vec3 playerSpawn, GLFWwindow *window) : world(
+        generateFlatWorld(width, height, depth, nbrTrees)) {
     world->create();
     pnjManager = new PNJManager(world);
     player = new GameObject(MeshManager::getMesh(MeshType::HUMAN));

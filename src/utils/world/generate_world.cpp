@@ -6,7 +6,7 @@
 #include "../../world/World.h"
 
 
-World* generateFlatWorld(int length, int width, int depth) {
+World* generateFlatWorld(int length, int width, int depth, int nbrTrees) {
     std::map<std::tuple<int, int, int>, std::tuple<int, MeshType, TextureType>> map;
 
     for (int i = 0; i < length; i++) {
@@ -29,7 +29,7 @@ World* generateFlatWorld(int length, int width, int depth) {
     }
 
     // add little trees randomly
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < nbrTrees; i++) {
         int x = rand() % length;
         int y = rand() % width;
         for(int j = 0; j < 5; j++) {
