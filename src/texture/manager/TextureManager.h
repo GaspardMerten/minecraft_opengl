@@ -14,7 +14,9 @@ enum TextureType {
     DIRT,
     PLAYER,
     WOOD,
-    LEAF
+    LEAF,
+    WHITE_SHEEP,
+    GLOW_STONE
 
 };
 
