@@ -165,12 +165,15 @@ int main(int argc, char *argv[]) {
 
     MeshManager::linkMesh(MeshType::BLOCK, "resources/objects/cube.obj");
     MeshManager::linkMesh(MeshType::HUMAN, "resources/objects/stevy.obj");
+    MeshManager::linkMesh(MeshType::SHEEP, "resources/objects/sheep/sheep.obj");
 
 
     TextureManager::linkTexture(TextureType::DIRT, "resources/textures/dirt.jpg");
     TextureManager::linkTexture(TextureType::WOOD, "resources/textures/wood.jpg");
     TextureManager::linkTexture(TextureType::LEAF, "resources/textures/leaf.jpeg");
     TextureManager::linkTexture(TextureType::PLAYER, "resources/textures/steve.jpg");
+    TextureManager::linkTexture(TextureType::GLOW_STONE, "resources/textures/glowstone.jpg");
+    TextureManager::linkTexture(TextureType::WHITE_SHEEP, "resources/textures/sheep.jpg");
 
 
     auto* minecraft = new Minecraft(50, 50, 1, glm::vec3(15, 1, 15), window);
@@ -197,7 +200,7 @@ int main(int argc, char *argv[]) {
     // Take care of all the light related things
     unsigned int depthMapFBO;
     glGenFramebuffers(1, &depthMapFBO);
-    const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+    const unsigned int SHADOW_WIDTH = 1048, SHADOW_HEIGHT = 1048;
 
     unsigned int depthMap;
     glGenTextures(1, &depthMap);
@@ -206,16 +209,14 @@ int main(int argc, char *argv[]) {
                  SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    float near_plane = 1.0f, far_plane = 7.5f;
-    glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
 
 
     glDepthFunc(GL_LESS);
@@ -223,10 +224,29 @@ int main(int argc, char *argv[]) {
     glDepthMask(GL_TRUE);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
+    int n = 0;
+
+
+    float near_plane = 1.0f, far_plane = 7.5f;
+    glm::mat4 lightProjection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, near_plane, far_plane);
+    glm::mat4 lightView = glm::lookAt(minecraft->light->transform->position - glm::vec3(0, 5, 0.f),
+                                      minecraft->light->transform->position- glm::vec3(0.0f, 20.0f, 0.0f),
+                                      glm::vec3( 0.0f, 0.0f,  1.0f));
+    glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
     while (!glfwWindowShouldClose(window)) {
+        n+=1;
         minecraft->processEvents(window);
 
+        glm::vec4 computed = lightSpaceMatrix*minecraft->player->transform.getModel()*glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+
+      if (n%100 == 0) {
+          // print computed
+          std::cout << computed.x << " " << computed.y << " " << computed.z << " " << computed.w << std::endl;
+          // print player position
+          std::cout << minecraft->player->transform.position.x << " " << minecraft->player->transform.position.y << " "
+                    << minecraft->player->transform.position.z << std::endl;
+      }
         int width, height;
 
         glfwPollEvents();
@@ -234,12 +254,14 @@ int main(int argc, char *argv[]) {
         glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
         glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
         glClear(GL_DEPTH_BUFFER_BIT);
+
         shadowShader.use();
         minecraft->configureMatrices(shadowShader);
-        shadowShader.setMatrix4("lightSpaceMatrix", minecraft->light->getSpaceMatrix());
+        shadowShader.setMatrix4("lightSpaceMatrix", lightSpaceMatrix);
         glCullFace(GL_FRONT);
         minecraft->render(shadowShader);
         glCullFace(GL_BACK);
+
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glActiveTexture(GL_TEXTURE0 + 2);
         glBindTexture(GL_TEXTURE_2D, depthMap);
@@ -251,9 +273,8 @@ int main(int argc, char *argv[]) {
 
 
 
-
         shader.use();
-        shader.setMatrix4("lightSpaceMatrix", minecraft->light->getSpaceMatrix());
+        shader.setMatrix4("lightSpaceMatrix", lightSpaceMatrix);
         minecraft->configureMatrices(shader);
         glBindTexture(GL_TEXTURE_2D, depthMap);
         minecraft->render(shader);
