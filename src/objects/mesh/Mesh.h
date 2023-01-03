@@ -19,7 +19,6 @@ struct MeshVertex {
 
 
 class Mesh {
-    std::vector<MeshVertex> vertices;
 
     void loadMesh(const std::string& path);
 
@@ -44,6 +43,8 @@ public:
     float* toFloatArray();
 
     int getFloatArraySize();
+
+    std::vector<MeshVertex> vertices;
 };
 
 

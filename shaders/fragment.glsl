@@ -1,4 +1,7 @@
-#version 330 core
+#version 420 core
+layout(binding=0) uniform sampler2D tex;
+layout(binding=1) uniform sampler2D shadowMap;
+
 out vec4 FragColor;
 precision mediump float;
 
@@ -9,7 +12,6 @@ in vec2 v_t;
 in vec4 fragPosLightSpace;
 
 uniform vec3 u_view_pos;
-uniform sampler2D tex;
 
 struct Light {
     vec3 light_pos;
@@ -25,7 +27,6 @@ uniform Light light;
 
 uniform float shininess;
 uniform vec3 materialColour;
-uniform sampler2D shadowMap;
 
 float speculatCalculation(vec3 N, vec3 L, vec3 V) {
     vec3 R = reflect(-L, N);
@@ -35,36 +36,13 @@ float speculatCalculation(vec3 N, vec3 L, vec3 V) {
 }
 
 
-float ShadowCalculation(vec4 fragPosLightSpace)
+float calculateShadowIntensity(vec4 shadowPos)
 {
-    // perform perspective divide
-    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
-    // transform to [0,1] range
-    projCoords = projCoords * 0.5;
-    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
-    float closestDepth = texture(shadowMap, projCoords.xy).r;
-    // get depth of current fragment from light's perspective
-    float currentDepth = projCoords.z;
-
-    if (projCoords.z > 1) {
-        return 0.0;
-    }
-    // check whether current frag pos is in shadow
-
+    vec3 shadowCoord = (shadowPos.xyz/shadowPos.w) * 0.5 + 0.5;
+    float currentDepth = shadowCoord.z;
+    float closestDepth = texture(shadowMap, shadowCoord.xy).r;
     float bias = 0.005;
-    float shadow = 0.0;
-
-    vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
-    for(int x = -1; x <= 1; ++x)
-    {
-        for(int y = -1; y <= 1; ++y)
-        {
-            float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
-            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
-        }
-    }
-    shadow /= 9.0;
-
+    float shadow = currentDepth == closestDepth  ? 1.0 : 0.0;
     return shadow;
 }
 
@@ -78,8 +56,8 @@ void main() {
     float distance = length(light.light_pos - v_frag_coord);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
     float light = light.ambient_strength + diffuse * attenuation + specular * attenuation;
-    float shadow = ShadowCalculation(fragPosLightSpace);
+    float shadow = calculateShadowIntensity(fragPosLightSpace);
 
-    FragColor = (1-shadow) * (texture(tex, v_t) * vec4(vec3(light), 1.0));
+    FragColor = shadow*(texture(tex, v_t) * vec4(vec3(light), 1.0));
 }
 

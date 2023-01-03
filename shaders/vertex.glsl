@@ -22,7 +22,7 @@ void main(){
     v_frag_coord = frag_coord.xyz;
 
 
-    fragPosLightSpace = lightSpaceMatrix * vec4(vec3(M*vec4(position, 1.0)), 1);
+    fragPosLightSpace = lightSpaceMatrix * vec4(frag_coord.xyz, 1.0);
     v_t = tex_coord;
     gl_Position = P*V*frag_coord;
 }

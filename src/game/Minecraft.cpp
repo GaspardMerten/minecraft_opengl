@@ -12,6 +12,12 @@ Minecraft::Minecraft(int width, int height, int depth, int nbrTrees, glm::vec3 p
     world->create();
     pnjManager = new PNJManager(world);
     physicsManager = new PhysicsManager(world);
+
+    auto block = new GameObject(MeshManager::getMesh(MeshType::BLOCK));
+    block->setTextureID(TextureManager::getTextureID(TextureType::DIRT));
+    block->transform.setPosition(22, 5, 20);
+    toRender.push_back(block);
+
     player = new GameObject(MeshManager::getMesh(MeshType::HUMAN));
     player->setTextureID(TextureManager::getTextureID(TextureType::PLAYER));
     player->transform.setPosition(playerSpawn.x, playerSpawn.y, playerSpawn.z);
@@ -19,7 +25,6 @@ Minecraft::Minecraft(int width, int height, int depth, int nbrTrees, glm::vec3 p
     camera = new Camera(player->transform);
     cameraControls = new CameraControls(*camera, window);
     playerControls = new PlayerControls(player, *camera, *world);
-
     double size = 0.6;
 
     for (int i = 0; i < 15; i++) {
@@ -54,23 +59,19 @@ Minecraft::Minecraft(int width, int height, int depth, int nbrTrees, glm::vec3 p
 
 
 
-    auto* cube = new GameObject(MeshManager::getMesh(MeshType::BLOCK));
-    cube->setTextureID(TextureManager::getTextureID(TextureType::GLOW_STONE));
-    toRender.push_back(cube);
 
     light = new Light(
-            glm::vec3(22, 10, 40),
+            glm::vec3(22, 50, 20),
             glm::vec3(0.0, 0.0, 0.0),
             0.5,
             0.8,
-            0.5,
+            1,
             5.0,
-            0.014,
+            0.00000014,
             0,
             1.0
     );
 
-    cube->transform.setPosition(22, 10, 40);
     physicsManager->linkGameObject(player);
 
 }
@@ -83,9 +84,9 @@ void Minecraft::render(Shader &shader) {
         light->use(shader);
     }
 
-
     world->draw(shader);
     player->draw(shader);
+
     for (auto &gameObject : toRender) {
         gameObject->draw(shader);
     }

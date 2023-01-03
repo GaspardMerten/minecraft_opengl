@@ -18,8 +18,6 @@
 class Minecraft {
     glm::vec3 playerSpawn{};
 
-    World *world;
-
     PlayerControls *playerControls;
 
     CameraControls *cameraControls;
@@ -44,6 +42,7 @@ public:
     Light *light;
     GameObject *player;
     std::vector<GameObject*> toRender = std::vector<GameObject*>();
+    World *world;
 };
 
 

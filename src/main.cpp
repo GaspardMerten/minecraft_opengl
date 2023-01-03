@@ -31,7 +31,8 @@ const int width = 500;
 const int height = 500;
 
 
-Shader loadShader(const std::string &vertexPath, const std::string &fragmentPath, bool withTexture = true, bool withLight = true);
+Shader loadShader(const std::string &vertexPath, const std::string &fragmentPath, bool withTexture = true,
+                  bool withLight = true);
 
 #ifndef NDEBUG
 
@@ -180,7 +181,7 @@ int main(int argc, char *argv[]) {
     TextureManager::linkTexture(TextureType::GRASS, "resources/textures/grass.jpg");
 
 
-    auto* minecraft = new Minecraft(150, 100, 1,100, glm::vec3(15, 1, 15), window);
+    auto *minecraft = new Minecraft(150, 100, 1, 10, glm::vec3(15, 1, 15), window);
 
 
     Shader shadowShader = loadShader("shadow.vert.glsl", "shadow.frag.glsl", false, false);
@@ -197,85 +198,100 @@ int main(int argc, char *argv[]) {
 
     glfwGetCursorPos(window, &prevX, &prevY);
 
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+
 
     /**
      * Shadow part
      */
-    // Take care of all the light related things
-    unsigned int depthMapFBO;
-    glGenFramebuffers(1, &depthMapFBO);
-    const unsigned int SHADOW_WIDTH = 1048, SHADOW_HEIGHT = 1048;
 
-    unsigned int depthMap;
-    glGenTextures(1, &depthMap);
-    glBindTexture(GL_TEXTURE_2D, depthMap);
+    int shadowTextureWidth = 4096;
+    int shadowTextureHeight = 4096;
+
+    GLuint m_ShadowMapDepthStencilTextureId;
+    GLuint m_ShadowMapFBOId;
+
+    glGenFramebuffers(1, &m_ShadowMapFBOId);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_ShadowMapFBOId);
+
+    glGenTextures(1, &m_ShadowMapDepthStencilTextureId);
+    glBindTexture(GL_TEXTURE_2D, m_ShadowMapDepthStencilTextureId);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
-                 SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+                 shadowTextureWidth, shadowTextureHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_ShadowMapDepthStencilTextureId, 0);
+
+
+    // Needed since we don't touch the color buffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-
-
-    glDepthFunc(GL_LESS);
-    glEnable(GL_DEPTH_TEST);
-    glDepthMask(GL_TRUE);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
-    int n = 0;
 
 
-    float near_plane = 1.0f, far_plane = 7.5f;
-    glm::mat4 lightProjection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, near_plane, far_plane);
-    glm::mat4 lightView = glm::lookAt(minecraft->light->transform->position - glm::vec3(0, 5, 0.f),
-                                      minecraft->light->transform->position- glm::vec3(0.0f, 20.0f, 0.0f),
-                                      glm::vec3( 0.0f, 0.0f,  1.0f));
-    glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+    const glm::mat4 &lightP = glm::perspective(glm::radians(45.0f), 16.0f / 9.0f, 0.01f, 100.0f);
+    minecraft->light->transform->setRotationX(-90);
+    const glm::mat4 &lightV = minecraft->light->getSpaceMatrix();
+    glm::mat4 lightSpaceMatrix = lightP * lightV;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    glm::vec3 blockPos = glm::vec3(22, 0, 20);
+    GameObject *block = minecraft->world->getBlockAt(blockPos);
+    glm::vec4 frag_coord = block->transform.getModel() * glm::vec4(block->mesh->vertices.at(0).position, 1.0);
+    glm::vec4 tmp = lightP*lightV*frag_coord;
+    // print w
+    std::cout << tmp.w << std::endl;
+    std::cout << tmp.x/tmp.w << " " << tmp.y/tmp.w << " " << tmp.z/tmp.w << std::endl;
+
 
     while (!glfwWindowShouldClose(window)) {
-        n+=1;
         minecraft->processEvents(window);
-
-        glm::vec4 computed = lightSpaceMatrix*minecraft->player->transform.getModel()*glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-
         minecraft->updateManagers();
 
         int width, height;
 
         glfwPollEvents();
-
-        glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-        glClear(GL_DEPTH_BUFFER_BIT);
+        // print shadowMapFBO
 
         shadowShader.use();
-        minecraft->configureMatrices(shadowShader);
-        shadowShader.setMatrix4("lightSpaceMatrix", lightSpaceMatrix);
-        glCullFace(GL_FRONT);
+        glDisable(GL_MULTISAMPLE);
+        glActiveTexture(GL_TEXTURE0);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_ShadowMapFBOId);
+        glViewport(0, 0, shadowTextureWidth, shadowTextureHeight);
+        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+        glClearDepth(1.0f);
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+        shadowShader.setMatrix4("P", lightP);
+        shadowShader.setMatrix4("V",lightV);
+
+
         minecraft->render(shadowShader);
-        glCullFace(GL_BACK);
+        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glActiveTexture(GL_TEXTURE0 + 2);
-        glBindTexture(GL_TEXTURE_2D, depthMap);
-
-        glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glfwGetFramebufferSize(window, &width, &height);
-        glViewport(0, 0, width, height);
-
-
-
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         shader.use();
+        glViewport(0, 0, width, height);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClearDepth(1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        glEnable(GL_CULL_FACE);
+        glFrontFace(GL_CCW);
+        glCullFace(GL_BACK);
+        glActiveTexture(GL_TEXTURE0+1);
+        glBindTexture(GL_TEXTURE_2D, m_ShadowMapDepthStencilTextureId);
+
+
+
         shader.setMatrix4("lightSpaceMatrix", lightSpaceMatrix);
         minecraft->configureMatrices(shader);
-        glBindTexture(GL_TEXTURE_2D, depthMap);
+
         minecraft->render(shader);
 
 
@@ -300,7 +316,7 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-Shader loadShader(const std::string &vertexPath, const std::string &fragmentPath, bool withTexture,bool withLight) {
+Shader loadShader(const std::string &vertexPath, const std::string &fragmentPath, bool withTexture, bool withLight) {
     // join folder path with shader file name (platform independent)
     std::string vertexShaderPath = SHADER_PATH + vertexPath;
     std::string fragmentShaderPath = SHADER_PATH + fragmentPath;

@@ -9,9 +9,6 @@ Camera::Camera(Transform &transform) : transform(transform) {
 
 }
 glm::mat4 Camera::getViewMatrix()  {
-    // get vector in orientation of camera
-    glm::vec3 cameraDirection = glm::normalize(transform.rotation);
-
     auto model = glm::translate(transform.getModel(), glm::vec3(0, 15/zoom, 50/zoom));
     return glm::inverse(model);
 }

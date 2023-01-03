@@ -4,17 +4,20 @@
 
 #include "Renderer.h"
 
-void Renderer::draw(Shader &Shader, Transform &transform, Mesh *mesh, GLuint textureID) const {
+void Renderer::draw(Shader &shader, Transform &transform, Mesh *mesh, GLuint textureID) const {
     // print texture
-    glBindTexture(GL_TEXTURE_2D, textureID);
-    glActiveTexture(GL_TEXTURE0);
+    if (shader.withTexture) {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        glUniform1i(glGetUniformLocation(shader.ID, "tex"), 0);
+    }
 
-    Shader.setMatrix4("M", transform.getModel());
+    shader.setMatrix4("M", transform.getModel());
     glBindVertexArray(this->VAO);
     glDrawArrays(GL_TRIANGLES, 0, mesh->getVerticesCount());
 }
 
-void Renderer::makeObject(Shader &shader, Mesh * mesh, Transform &transform) {
+void Renderer::makeObject(Shader &shader, Mesh *mesh, Transform &transform) {
     float *data = mesh->toFloatArray();
     int dataSize = mesh->getFloatArraySize();
 
@@ -34,7 +37,7 @@ void Renderer::makeObject(Shader &shader, Mesh * mesh, Transform &transform) {
 
     auto att_pos = glGetAttribLocation(shader.ID, "position");
     glEnableVertexAttribArray(att_pos);
-    glVertexAttribPointer(att_pos, 3, GL_FLOAT, false, 8 * sizeof(float), (void *) 0);
+    glVertexAttribPointer(att_pos, 3, GL_FLOAT, false, 8 * sizeof(float), (void *) nullptr);
 
     if (shader.withTexture) {
         auto att_tex = glGetAttribLocation(shader.ID, "tex_coord");
