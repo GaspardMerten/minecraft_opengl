@@ -23,6 +23,7 @@ Minecraft::Minecraft(int width, int height, int depth, int nbrTrees, glm::vec3 p
     playerLArm = new GameObject(MeshManager::getMesh(MeshType::STEVE_L_ARM));
     playerLArm->setTextureID(TextureManager::getTextureID(TextureType::PLAYER));
     playerLArm->transform = player->transform;
+    //playerLArm->transform.setPosition(playerLArm->transform.position.x, playerLArm->transform.position.y, playerLArm->transform.position.z - 5);
     //playerLArm->collider = Collider{0.1f, 0.1f, 0.5f};
 
     // Right arm
@@ -33,7 +34,7 @@ Minecraft::Minecraft(int width, int height, int depth, int nbrTrees, glm::vec3 p
 
     camera = new Camera(player->transform);
     cameraControls = new CameraControls(*camera, window);
-    playerControls = new PlayerControls(player, *camera, *world);
+    playerControls = new PlayerControls(player, playerLArm, playerRArm, *camera, *world);
 
     double size = 0.6;
 
