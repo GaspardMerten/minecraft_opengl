@@ -206,8 +206,8 @@ int main(int argc, char *argv[]) {
      * Shadow part
      */
 
-    int shadowTextureWidth = 12000;
-    int shadowTextureHeight = 12000;
+    int shadowTextureWidth = 4096;
+    int shadowTextureHeight = 4096;
 
     GLuint m_ShadowMapDepthStencilTextureId;
     GLuint m_ShadowMapFBOId;
@@ -235,8 +235,10 @@ int main(int argc, char *argv[]) {
 
 
 
-    const glm::mat4 &lightP = glm::perspective(glm::radians(45.0f), 16.0f / 9.0f, 0.01f, 250.0f);
-    minecraft->light->transform->setRotationX(-90);
+    const glm::mat4 &lightP = glm::ortho(-120.0f, 120.0f, -120.0f, 120.0f, 0.1f, 100.0f);
+    minecraft->light->transform->rotation = glm::vec3(-80, 0, 20);
+    minecraft->light->transform->markAsDirtyState();
+
     const glm::mat4 &lightV = minecraft->light->getSpaceMatrix();
     glm::mat4 lightSpaceMatrix = lightP * lightV;
 
@@ -272,7 +274,6 @@ int main(int argc, char *argv[]) {
         shadowShader.setMatrix4("P", lightP);
         shadowShader.setMatrix4("V",lightV);
 
-        glCullFace(GL_BACK);
         minecraft->render(shadowShader);
         glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
@@ -283,17 +284,12 @@ int main(int argc, char *argv[]) {
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClearDepth(1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        glEnable(GL_CULL_FACE);
-        glFrontFace(GL_CCW);
-        glCullFace(GL_BACK);
         glActiveTexture(GL_TEXTURE0+1);
         glBindTexture(GL_TEXTURE_2D, m_ShadowMapDepthStencilTextureId);
 
 
         shader.setMatrix4("lightSpaceMatrix", lightSpaceMatrix);
         minecraft->configureMatrices(shader);
-       // shader.setMatrix4("V",lightV);
-        //shader.setMatrix4("P",lightP);
 
         minecraft->render(shader);
 

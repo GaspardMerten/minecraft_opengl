@@ -42,7 +42,7 @@ float calculateShadowIntensity(vec4 shadowPos)
     float currentDepth = shadowCoord.z;
     float closestDepth = texture(shadowMap, shadowCoord.xy).r;
 
-    float bias = 0.000005;
+    float bias = 0.0005;
     float shadow = 0.0;
     vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
     for(int x = -1; x <= 1; ++x)
