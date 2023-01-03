@@ -12,10 +12,25 @@ Minecraft::Minecraft(int width, int height, int depth, int nbrTrees, glm::vec3 p
     world->create();
     pnjManager = new PNJManager(world);
     physicsManager = new PhysicsManager(world);
-    player = new GameObject(MeshManager::getMesh(MeshType::HUMAN));
+
+    // Player setup
+    player = new GameObject(MeshManager::getMesh(MeshType::STEVE_BODY));
     player->setTextureID(TextureManager::getTextureID(TextureType::PLAYER));
     player->transform.setPosition(playerSpawn.x, playerSpawn.y, playerSpawn.z);
     player->collider = Collider{0.1f, 0.1f, 0.5f};
+
+    // Left arm
+    playerLArm = new GameObject(MeshManager::getMesh(MeshType::STEVE_L_ARM));
+    playerLArm->setTextureID(TextureManager::getTextureID(TextureType::PLAYER));
+    playerLArm->transform = player->transform;
+    //playerLArm->collider = Collider{0.1f, 0.1f, 0.5f};
+
+    // Right arm
+    playerRArm = new GameObject(MeshManager::getMesh(MeshType::STEVE_R_ARM));
+    playerRArm->setTextureID(TextureManager::getTextureID(TextureType::PLAYER));
+    playerRArm->transform = player->transform;
+
+
     camera = new Camera(player->transform);
     cameraControls = new CameraControls(*camera, window);
     playerControls = new PlayerControls(player, *camera, *world);
@@ -86,6 +101,9 @@ void Minecraft::render(Shader &shader) {
 
     world->draw(shader);
     player->draw(shader);
+    playerLArm->draw(shader);
+    playerRArm->draw(shader);
+
     for (auto &gameObject : toRender) {
         gameObject->draw(shader);
     }
@@ -94,6 +112,9 @@ void Minecraft::render(Shader &shader) {
 void Minecraft::linkShader(Shader &shader) {
     world->makeObjects(shader);
     player->makeObject(shader);
+    playerLArm->makeObject(shader);
+    playerRArm->makeObject(shader);
+
     for (auto &gameObject : toRender) {
         gameObject->makeObject(shader);
     }

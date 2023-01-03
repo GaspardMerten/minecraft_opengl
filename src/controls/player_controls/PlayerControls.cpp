@@ -15,6 +15,7 @@ void PlayerControls::processEvents(GLFWwindow *window) {
     if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) != GLFW_PRESS) {
         if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
             player->transform.translate(-speed, 0, 0);
+
         }
         if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
             player->transform.translate(speed, 0, 0);
