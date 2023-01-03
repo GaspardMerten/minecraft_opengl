@@ -206,8 +206,8 @@ int main(int argc, char *argv[]) {
      * Shadow part
      */
 
-    int shadowTextureWidth = 4096;
-    int shadowTextureHeight = 4096;
+    int shadowTextureWidth = 12000;
+    int shadowTextureHeight = 12000;
 
     GLuint m_ShadowMapDepthStencilTextureId;
     GLuint m_ShadowMapFBOId;
@@ -223,6 +223,8 @@ int main(int argc, char *argv[]) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_ShadowMapDepthStencilTextureId, 0);
 
 
@@ -233,14 +235,14 @@ int main(int argc, char *argv[]) {
 
 
 
-    const glm::mat4 &lightP = glm::perspective(glm::radians(45.0f), 16.0f / 9.0f, 0.01f, 100.0f);
+    const glm::mat4 &lightP = glm::perspective(glm::radians(45.0f), 16.0f / 9.0f, 0.01f, 250.0f);
     minecraft->light->transform->setRotationX(-90);
     const glm::mat4 &lightV = minecraft->light->getSpaceMatrix();
     glm::mat4 lightSpaceMatrix = lightP * lightV;
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    glm::vec3 blockPos = glm::vec3(22, 0, 20);
+    glm::vec3 blockPos = glm::vec3(70, 0, 70);
     GameObject *block = minecraft->world->getBlockAt(blockPos);
     glm::vec4 frag_coord = block->transform.getModel() * glm::vec4(block->mesh->vertices.at(0).position, 1.0);
     glm::vec4 tmp = lightP*lightV*frag_coord;
@@ -270,7 +272,7 @@ int main(int argc, char *argv[]) {
         shadowShader.setMatrix4("P", lightP);
         shadowShader.setMatrix4("V",lightV);
 
-
+        glCullFace(GL_BACK);
         minecraft->render(shadowShader);
         glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
@@ -288,9 +290,10 @@ int main(int argc, char *argv[]) {
         glBindTexture(GL_TEXTURE_2D, m_ShadowMapDepthStencilTextureId);
 
 
-
         shader.setMatrix4("lightSpaceMatrix", lightSpaceMatrix);
         minecraft->configureMatrices(shader);
+       // shader.setMatrix4("V",lightV);
+        //shader.setMatrix4("P",lightP);
 
         minecraft->render(shader);
 
