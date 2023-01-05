@@ -206,8 +206,8 @@ int main(int argc, char *argv[]) {
      * Shadow part
      */
 
-    int shadowTextureWidth = 4096;
-    int shadowTextureHeight = 4096;
+    int shadowTextureWidth = 2048;
+    int shadowTextureHeight = 2048;
 
     GLuint m_ShadowMapDepthStencilTextureId;
     GLuint m_ShadowMapFBOId;
@@ -226,7 +226,8 @@ int main(int argc, char *argv[]) {
     float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_ShadowMapDepthStencilTextureId, 0);
-
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
 
     // Needed since we don't touch the color buffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
