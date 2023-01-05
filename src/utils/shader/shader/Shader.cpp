@@ -81,3 +81,7 @@ void Shader::set1i(const GLchar *name, GLint value) const {
     glUniform1i(glGetUniformLocation(ID, name), value);
 }
 
+void Shader::setBool(const char *string, bool b) {
+    glUniform1i(glGetUniformLocation(ID, string), (int) b);
+}
+

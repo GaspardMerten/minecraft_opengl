@@ -6,14 +6,10 @@
 
 //Don't forget the glm header
 #include <glm/glm.hpp>
-#include<glm/gtc/matrix_transform.hpp>
-#include<glm/gtc/type_ptr.hpp>
 #include "stb_image.h"
 
-#include <chrono>
 #include <thread>
 
-#include "utils/shader/load/load_shader.h"
 #include "utils/shader/shader/Shader.h"
 #include "objects/game_object/GameObject.h"
 #include "utils/shader/shader/Light.h"
@@ -24,11 +20,12 @@
 #include "controls/camera/CameraControls.h"
 #include "game/Minecraft.h"
 #include "objects/mesh/manager/MeshManager.h"
+#include "cubemap/CubeMap.h"
 
 #define SHADER_PATH "shaders/"
 
-const int width = 500;
-const int height = 500;
+const int INITIAL_WINDOW_WIDTH = 500;
+const int INITIAL_WINDOW_HEIGHT = 500;
 
 
 Shader loadShader(const std::string &vertexPath, const std::string &fragmentPath, bool withTexture = true,
@@ -68,6 +65,9 @@ void APIENTRY glDebugOutput(GLenum source,
         case GL_DEBUG_SOURCE_OTHER:
             std::cout << "Source: Other";
             break;
+        default:
+            std::cout << "Unknown error";
+            break;
     }
     std::cout << std::endl;
 
@@ -99,6 +99,9 @@ void APIENTRY glDebugOutput(GLenum source,
         case GL_DEBUG_TYPE_OTHER:
             std::cout << "Type: Other";
             break;
+        default:
+            std::cout << "Unknown error";
+            break;
     }
     std::cout << std::endl;
 
@@ -115,6 +118,9 @@ void APIENTRY glDebugOutput(GLenum source,
         case GL_DEBUG_SEVERITY_NOTIFICATION:
             std::cout << "Severity: notification";
             break;
+        default:
+            std::cout << "Unknown severity";
+            break;
     }
     std::cout << std::endl;
     std::cout << std::endl;
@@ -123,7 +129,7 @@ void APIENTRY glDebugOutput(GLenum source,
 #endif
 
 
-int main(int argc, char *argv[]) {
+int main() {
     if (!glfwInit()) {
         throw std::runtime_error("Failed to initialise GLFW \n");
     }
@@ -137,7 +143,7 @@ int main(int argc, char *argv[]) {
 #endif
 
     //Create the window
-    GLFWwindow *window = glfwCreateWindow(width, height, "Gaspard is cool", nullptr, nullptr);
+    GLFWwindow *window = glfwCreateWindow(INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT, "Gaspard is cool", nullptr, nullptr);
 
     if (window == nullptr) {
         glfwTerminate();
@@ -169,6 +175,7 @@ int main(int argc, char *argv[]) {
     MeshManager::linkMesh(MeshType::SHEEP, "resources/objects/sheep/sheep.obj");
     MeshManager::linkMesh(MeshType::VILLAGER, "resources/objects/villager.obj");
     MeshManager::linkMesh(MeshType::CUBEMAP, "resources/objects/grass.obj");
+    MeshManager::linkMesh(MeshType::PLANE, "resources/objects/plane.obj");
 
 
     TextureManager::linkTexture(TextureType::DIRT, "resources/textures/dirt.jpg");
@@ -179,15 +186,30 @@ int main(int argc, char *argv[]) {
     TextureManager::linkTexture(TextureType::WHITE_SHEEP, "resources/textures/sheep.jpg");
     TextureManager::linkTexture(TextureType::BROWN_VILLAGER, "resources/textures/villager.jpg");
     TextureManager::linkTexture(TextureType::GRASS, "resources/textures/grass.jpg");
+    TextureManager::linkTexture(TextureType::WATER, "resources/textures/water.jpg");
 
 
-    auto *minecraft = new Minecraft(150, 100, 1, 10, glm::vec3(15, 1, 15), window);
+    auto *minecraft = new Minecraft(100, 100, 1, 30,  4, glm::vec3(15, 1, 15), window);
 
 
     Shader shadowShader = loadShader("shadow.vert.glsl", "shadow.frag.glsl", false, false);
     Shader shader = loadShader("vertex.glsl", "fragment.glsl");
+    Shader cubeMapShader = loadShader("cubemap.vert.glsl", "cubemap.frag.glsl");
     minecraft->linkShader(shader);
     minecraft->linkShader(shadowShader);
+
+    std::map<std::string, GLenum> facesToLoad = {
+            {"posx.jpg",GL_TEXTURE_CUBE_MAP_POSITIVE_X},
+            {"posy.jpg",GL_TEXTURE_CUBE_MAP_POSITIVE_Y},
+            {"posz.jpg",GL_TEXTURE_CUBE_MAP_POSITIVE_Z},
+            {"negx.jpg",GL_TEXTURE_CUBE_MAP_NEGATIVE_X},
+            {"negy.jpg",GL_TEXTURE_CUBE_MAP_NEGATIVE_Y},
+            {"negz.jpg",GL_TEXTURE_CUBE_MAP_NEGATIVE_Z},
+    };
+
+    auto* dayCubeMap = new CubeMap("resources/skybox/day/skybox_", facesToLoad);
+
+    dayCubeMap->makeObject(shadowShader);
 
 
     glfwSwapInterval(1);
@@ -199,15 +221,15 @@ int main(int argc, char *argv[]) {
     glfwGetCursorPos(window, &prevX, &prevY);
 
     glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
+    glDepthFunc(GL_EQUAL);
 
 
     /**
      * Shadow part
      */
 
-    int shadowTextureWidth = 2048;
-    int shadowTextureHeight = 2048;
+    int shadowTextureWidth = 4096;
+    int shadowTextureHeight = 4096;
 
     GLuint m_ShadowMapDepthStencilTextureId;
     GLuint m_ShadowMapFBOId;
@@ -219,8 +241,8 @@ int main(int argc, char *argv[]) {
     glBindTexture(GL_TEXTURE_2D, m_ShadowMapDepthStencilTextureId);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
                  shadowTextureWidth, shadowTextureHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
     float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -235,8 +257,7 @@ int main(int argc, char *argv[]) {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
 
-
-    const glm::mat4 &lightP = glm::ortho(-120.0f, 120.0f, -120.0f, 120.0f, 0.1f, 100.0f);
+    const glm::mat4 &lightP = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 1000.0f);
     minecraft->light->transform->rotation = glm::vec3(-80, 0, 20);
     minecraft->light->transform->markAsDirtyState();
 
@@ -253,16 +274,17 @@ int main(int argc, char *argv[]) {
     std::cout << tmp.w << std::endl;
     std::cout << tmp.x/tmp.w << " " << tmp.y/tmp.w << " " << tmp.z/tmp.w << std::endl;
 
+    glEnable(GL_CULL_FACE);
+    int width, height;
 
     while (!glfwWindowShouldClose(window)) {
         minecraft->processEvents(window);
         minecraft->updateManagers();
 
-        int width, height;
 
         glfwPollEvents();
+        glCullFace(GL_BACK);
         // print shadowMapFBO
-
         shadowShader.use();
         glDisable(GL_MULTISAMPLE);
         glActiveTexture(GL_TEXTURE0);
@@ -271,6 +293,7 @@ int main(int argc, char *argv[]) {
         glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
         glClearDepth(1.0f);
         glClear(GL_DEPTH_BUFFER_BIT);
+
 
         shadowShader.setMatrix4("P", lightP);
         shadowShader.setMatrix4("V",lightV);
@@ -281,6 +304,10 @@ int main(int argc, char *argv[]) {
         glfwGetFramebufferSize(window, &width, &height);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         shader.use();
+
+        glDisable(GL_CULL_FACE);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glViewport(0, 0, width, height);
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClearDepth(1.0f);
@@ -291,20 +318,19 @@ int main(int argc, char *argv[]) {
 
         shader.setMatrix4("lightSpaceMatrix", lightSpaceMatrix);
         minecraft->configureMatrices(shader);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, dayCubeMap->textureID);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(0);
 
+        // set u_viewPos
+        shader.setVector3f("u_view_pos",   minecraft->camera->transform.position);
         minecraft->render(shader);
 
 
-        // get current mouse position
-        double xpos, ypos;
 
-        glfwGetCursorPos(window, &xpos, &ypos);
-
-
-        // compute new orientation
-        prevX = xpos;
-        prevY = ypos;
-
+        cubeMapShader.use();
+        minecraft->configureMatrices(cubeMapShader);
+        dayCubeMap->draw(cubeMapShader);
         glfwSwapBuffers(window);
 
     }
@@ -336,7 +362,7 @@ GLuint compileProgram(GLuint vertexShader, GLuint fragmentShader) {
     GLint success;
     glGetProgramiv(programID, GL_LINK_STATUS, &success);
     if (!success) {
-        glGetProgramInfoLog(programID, 1024, NULL, infoLog);
+        glGetProgramInfoLog(programID, 1024, nullptr, infoLog);
         std::cout << "ERROR::PROGRAM_LINKING_ERROR:  " << infoLog << std::endl;
     }
     return programID;

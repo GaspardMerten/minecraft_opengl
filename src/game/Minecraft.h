@@ -26,7 +26,7 @@ class Minecraft {
 
     PhysicsManager *physicsManager;
 public:
-    Minecraft(int width, int height, int depth, int nbrTrees, glm::vec3 playerSpawn, GLFWwindow *window);
+    Minecraft(int width, int height, int depth, int nbrTrees, int nbCircles, glm::vec3 playerSpawn, GLFWwindow *window);
 
     void linkShader(Shader &shader);
 

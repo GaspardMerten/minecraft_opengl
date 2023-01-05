@@ -3,6 +3,7 @@
 //
 
 #include "Renderer.h"
+#include "../../texture/manager/TextureManager.h"
 
 void Renderer::draw(Shader &shader, Transform &transform, Mesh *mesh, GLuint textureID) const {
     // print texture
@@ -13,6 +14,15 @@ void Renderer::draw(Shader &shader, Transform &transform, Mesh *mesh, GLuint tex
     }
 
     shader.setMatrix4("M", transform.getModel());
+
+    if (textureID == TextureManager::getTextureID(TextureType::WATER)) {
+        shader.setFloat("opacity", .7);
+        shader.setBool("isWater", true);
+    } else {
+        shader.setBool("isWater", false);
+        shader.setFloat("opacity", 1);
+    }
+
     glBindVertexArray(this->VAO);
     glDrawArrays(GL_TRIANGLES, 0, mesh->getVerticesCount());
 }

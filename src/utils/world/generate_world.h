@@ -6,5 +6,5 @@
 
 
 
-World* generateFlatWorld(int length, int width, int depth, int nbrTrees);
+World* generateFlatWorld(int length, int width, int depth, int nbrTrees, int nbCircles);
 

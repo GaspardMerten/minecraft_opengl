@@ -26,6 +26,9 @@ public:
     void set1i(const GLchar* name, GLint value) const;
 
     bool withTexture, withLight;
+
+    void setBool(const char *string, bool b);
+
 private:
     static GLuint compileShader(const std::string& shaderCode, GLenum shaderType);
 

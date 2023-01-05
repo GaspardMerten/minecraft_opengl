@@ -16,15 +16,14 @@ enum TextureType {
     WOOD,
     LEAF,
     WHITE_SHEEP,
-    GLOW_STONE, BROWN_VILLAGER, GRASS
+    GLOW_STONE, BROWN_VILLAGER, GRASS, WATER
 };
-
 
 
 class TextureManager {
     static std::map<TextureType, GLuint> textures;
 public:
-    static void linkTexture(TextureType type, const char* path);
+    static void linkTexture(TextureType type, const char *path);
 
     static GLuint getTextureID(TextureType type);
 };

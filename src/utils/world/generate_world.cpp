@@ -6,7 +6,7 @@
 #include "../../world/World.h"
 
 
-World* generateFlatWorld(int length, int width, int depth, int nbrTrees) {
+World* generateFlatWorld(int length, int width, int depth, int nbrTrees, int nbCircles) {
     std::map<std::tuple<int, int, int>, std::tuple<int, MeshType, TextureType>> map;
 
     for (int i = 0; i < length; i++) {
@@ -16,6 +16,26 @@ World* generateFlatWorld(int length, int width, int depth, int nbrTrees) {
             }
         }
     }
+
+    int waterCenterX, waterCenterZ;
+    // randomly choose the center of the water, but not too close to the edges
+
+    for (int circle = 0; circle < nbCircles; circle++) {
+        waterCenterX = rand() % (length - 20) + 10;
+        waterCenterZ = rand() % (width - 20) + 10;
+        int waterRadius = rand() % 5 + 5;
+
+        for (int i = 0; i < length; i++) {
+            for (int j = 0; j < width; j++) {
+                if (pow(i - waterCenterX, 2) + pow(j - waterCenterZ, 2) < pow(waterRadius, 2)) {
+                    map[std::make_tuple(i, j, 0)] = std::make_tuple(1, MeshType::PLANE, TextureType::WATER);
+                    map[std::make_tuple(i, j, -1)] = std::make_tuple(1, MeshType::CUBEMAP, TextureType::DIRT);
+                }
+            }
+        }
+    }
+
+
 
     // add higher blocks only  on the edges
     for (int i = 0; i < length; i++) {

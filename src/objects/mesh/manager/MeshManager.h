@@ -14,7 +14,7 @@
 enum MeshType {
     HUMAN,
     BLOCK,
-    SHEEP, VILLAGER, CUBEMAP
+    SHEEP, VILLAGER, CUBEMAP, PLANE
 };
 
 

@@ -7,8 +7,8 @@
 #include "../objects/mesh/manager/MeshManager.h"
 #include "../texture/manager/TextureManager.h"
 
-Minecraft::Minecraft(int width, int height, int depth, int nbrTrees, glm::vec3 playerSpawn, GLFWwindow *window) : world(
-        generateFlatWorld(width, height, depth, nbrTrees)) {
+Minecraft::Minecraft(int width, int height, int depth, int nbrTrees, int nbCircles, glm::vec3 playerSpawn, GLFWwindow *window) : world(
+        generateFlatWorld(width, height, depth, nbrTrees, nbCircles)) {
     world->create();
     pnjManager = new PNJManager(world);
     physicsManager = new PhysicsManager(world);
@@ -61,7 +61,7 @@ Minecraft::Minecraft(int width, int height, int depth, int nbrTrees, glm::vec3 p
 
 
     light = new Light(
-            glm::vec3(50, 50, 50),
+            glm::vec3(50, 100, 50),
             glm::vec3(0.0, 0.0, 0.0),
             0.5,
             0.8,

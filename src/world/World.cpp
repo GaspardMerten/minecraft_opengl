@@ -75,7 +75,8 @@ bool World::collides(GameObject *object) {
     bool didCollide = false;
 
     for (glm::vec3 &vec: collisionBox) {
-        if (getBlockAt(vec) != nullptr) {
+        GameObject *blockAt = getBlockAt(vec);
+        if (blockAt != nullptr && blockAt->textureID != TextureManager::getTextureID(TextureType::WATER)) {
             didCollide = true;
             break;
         }
