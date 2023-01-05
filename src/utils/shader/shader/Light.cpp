@@ -10,7 +10,8 @@ Light::Light(glm::vec3 position, glm::vec3 materialColor, float ambientStrength,
 
     this->transform = new Transform();
     transform->setPosition(position.x, position.y, position.z);
-    transform->setRotationX(90);
+    transform->rotation = glm::vec3(-80, 0, 20);
+    transform->markAsDirtyState();
 
     this->materialColor = materialColor;
     this->ambientStrength = ambientStrength;
@@ -36,6 +37,9 @@ void Light::linkShader(Shader& shader) const {
 
 glm::mat4 Light::getSpaceMatrix() const {
     return glm::inverse(transform->getModel());
+}
+glm::mat4 Light::getOrthoProjectinoMatrix() const {
+    return glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 1000.0f);
 }
 
 void Light::use(Shader& shader) const {

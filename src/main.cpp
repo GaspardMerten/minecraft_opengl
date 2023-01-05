@@ -31,6 +31,24 @@ const int INITIAL_WINDOW_HEIGHT = 500;
 Shader loadShader(const std::string &vertexPath, const std::string &fragmentPath, bool withTexture = true,
                   bool withLight = true);
 
+void setupMeshs();
+
+void setupTextures();
+
+CubeMap *loadCubeMap();
+
+void setupShadowShader(int &shadowTextureWidth, int &shadowTextureHeight, GLuint &m_ShadowMapDepthStencilTextureId,
+                       GLuint &m_ShadowMapFBOId);
+
+void renderShadowMap(Minecraft *minecraft, Shader &shadowShader, int shadowTextureWidth, int shadowTextureHeight,
+                     GLuint m_ShadowMapFBOId, const glm::mat4 &lightV, const glm::mat4 &lightP);
+
+void renderMinecraft(GLFWwindow *window, Minecraft *minecraft, Shader &shader, const CubeMap *cubeMap,
+                     GLuint m_ShadowMapDepthStencilTextureId, const glm::mat4 &lightSpaceMatrix, int &width,
+                     int &height);
+
+void renderSkyBox(const Minecraft *minecraft, Shader &cubeMapShader, const CubeMap *cubeMap);
+
 #ifndef NDEBUG
 
 void APIENTRY glDebugOutput(GLenum source,
@@ -143,7 +161,8 @@ int main() {
 #endif
 
     //Create the window
-    GLFWwindow *window = glfwCreateWindow(INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT, "Gaspard is cool", nullptr, nullptr);
+    GLFWwindow *window = glfwCreateWindow(INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT, "Gaspard is cool", nullptr,
+                                          nullptr);
 
     if (window == nullptr) {
         glfwTerminate();
@@ -168,72 +187,147 @@ int main() {
     }
 #endif
 
-    const glm::vec3 light_pos = glm::vec3(0.5, 0.5, -0.7);
 
-    MeshManager::linkMesh(MeshType::BLOCK, "resources/objects/cube.obj");
-    MeshManager::linkMesh(MeshType::HUMAN, "resources/objects/stevy.obj");
-    MeshManager::linkMesh(MeshType::SHEEP, "resources/objects/sheep/sheep.obj");
-    MeshManager::linkMesh(MeshType::VILLAGER, "resources/objects/villager.obj");
-    MeshManager::linkMesh(MeshType::CUBEMAP, "resources/objects/grass.obj");
-    MeshManager::linkMesh(MeshType::PLANE, "resources/objects/plane.obj");
+    setupMeshs();
+    setupTextures();
 
-
-    TextureManager::linkTexture(TextureType::DIRT, "resources/textures/dirt.jpg");
-    TextureManager::linkTexture(TextureType::WOOD, "resources/textures/wood.jpg");
-    TextureManager::linkTexture(TextureType::LEAF, "resources/textures/leaves.jpg");
-    TextureManager::linkTexture(TextureType::PLAYER, "resources/textures/steve.jpg");
-    TextureManager::linkTexture(TextureType::GLOW_STONE, "resources/textures/glowstone.jpg");
-    TextureManager::linkTexture(TextureType::WHITE_SHEEP, "resources/textures/sheep.jpg");
-    TextureManager::linkTexture(TextureType::BROWN_VILLAGER, "resources/textures/villager.jpg");
-    TextureManager::linkTexture(TextureType::GRASS, "resources/textures/grass.jpg");
-    TextureManager::linkTexture(TextureType::WATER, "resources/textures/water.jpg");
-
-
-    auto *minecraft = new Minecraft(100, 100, 1, 30,  4, glm::vec3(15, 1, 15), window);
+    auto *minecraft = new Minecraft(100, 100, 1, 30, 4, glm::vec3(15, 1, 15), window);
 
 
     Shader shadowShader = loadShader("shadow.vert.glsl", "shadow.frag.glsl", false, false);
     Shader shader = loadShader("vertex.glsl", "fragment.glsl");
     Shader cubeMapShader = loadShader("cubemap.vert.glsl", "cubemap.frag.glsl");
+
     minecraft->linkShader(shader);
     minecraft->linkShader(shadowShader);
 
-    std::map<std::string, GLenum> facesToLoad = {
-            {"posx.jpg",GL_TEXTURE_CUBE_MAP_POSITIVE_X},
-            {"posy.jpg",GL_TEXTURE_CUBE_MAP_POSITIVE_Y},
-            {"posz.jpg",GL_TEXTURE_CUBE_MAP_POSITIVE_Z},
-            {"negx.jpg",GL_TEXTURE_CUBE_MAP_NEGATIVE_X},
-            {"negy.jpg",GL_TEXTURE_CUBE_MAP_NEGATIVE_Y},
-            {"negz.jpg",GL_TEXTURE_CUBE_MAP_NEGATIVE_Z},
-    };
+    CubeMap *cubeMap = loadCubeMap();
+    // load cubemap texture (the shader is not used here, but for similarity with the other objects)
+    cubeMap->makeObject(shader);
 
-    auto* dayCubeMap = new CubeMap("resources/skybox/day/skybox_", facesToLoad);
-
-    dayCubeMap->makeObject(shadowShader);
-
-
+    // enable vsync
     glfwSwapInterval(1);
 
-    // previous mouse positionx
-    double prevX = 0;
-    double prevY = 0;
-
-    glfwGetCursorPos(window, &prevX, &prevY);
-
+    /**
+     * OPENGL STATIC CONFIGURATION (all settings that are not going to change during the program)
+     */
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_EQUAL);
-
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
     /**
      * Shadow part
      */
-
-    int shadowTextureWidth = 4096;
-    int shadowTextureHeight = 4096;
-
+    int shadowTextureWidth;
+    int shadowTextureHeight;
     GLuint m_ShadowMapDepthStencilTextureId;
-    GLuint m_ShadowMapFBOId;
+    GLuint shadowMapFboId;
 
+    setupShadowShader(shadowTextureWidth, shadowTextureHeight, m_ShadowMapDepthStencilTextureId, shadowMapFboId);
+
+    // Needed since we don't touch the color buffer
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+    const glm::mat4 &lightV = minecraft->light->getSpaceMatrix();
+    const glm::mat4 &lightP = minecraft->light->getOrthoProjectinoMatrix();
+    glm::mat4 lightSpaceMatrix = lightP * lightV;
+
+    int width, height;
+
+
+    while (!glfwWindowShouldClose(window)) {
+        // process opengl events
+        glfwPollEvents();
+
+        // process input
+        minecraft->processEvents(window);
+
+        // update physics, pnjs, ...
+        minecraft->updateManagers();
+
+        renderShadowMap(
+                minecraft,
+                shadowShader,
+                shadowTextureWidth,
+                shadowTextureHeight,
+                shadowMapFboId,
+                lightV,
+                lightP
+        );
+
+        renderMinecraft(
+                window,
+                minecraft,
+                shader,
+                cubeMap,
+                m_ShadowMapDepthStencilTextureId,
+                lightSpaceMatrix,
+                width,
+                height
+        );
+
+        renderSkyBox(minecraft, cubeMapShader, cubeMap);
+
+        glfwSwapBuffers(window);
+    }
+
+    //clean up ressource
+    glfwDestroyWindow(window);
+    glfwTerminate();
+
+    return 0;
+}
+
+void renderSkyBox(const Minecraft *minecraft, Shader &cubeMapShader, const CubeMap *cubeMap) {
+    cubeMapShader.use();
+    minecraft->configureMatrices(cubeMapShader);
+    cubeMap->draw(cubeMapShader);
+}
+
+void renderMinecraft(GLFWwindow *window, Minecraft *minecraft, Shader &shader, const CubeMap *cubeMap,
+                     GLuint m_ShadowMapDepthStencilTextureId, const glm::mat4 &lightSpaceMatrix, int &width,
+                     int &height) {
+    glfwGetFramebufferSize(window, &width, &height);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    shader.use();
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glViewport(0, 0, width, height);
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClearDepth(1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glActiveTexture(GL_TEXTURE0 + 1);
+    glBindTexture(GL_TEXTURE_2D, m_ShadowMapDepthStencilTextureId);
+    shader.setMatrix4("lightSpaceMatrix", lightSpaceMatrix);
+    minecraft->configureMatrices(shader);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMap->textureID);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindVertexArray(0);
+    shader.setVector3f("u_view_pos", minecraft->camera->transform.position);
+    minecraft->render(shader);
+}
+
+void renderShadowMap(Minecraft *minecraft, Shader &shadowShader, int shadowTextureWidth, int shadowTextureHeight,
+                     GLuint m_ShadowMapFBOId, const glm::mat4 &lightV, const glm::mat4 &lightP) {
+    glActiveTexture(GL_TEXTURE0);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_ShadowMapFBOId);
+    glViewport(0, 0, shadowTextureWidth, shadowTextureHeight);
+    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    shadowShader.use();
+    shadowShader.setMatrix4("P", lightP);
+    shadowShader.setMatrix4("V", lightV);
+    minecraft->render(shadowShader);
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+}
+
+void setupShadowShader(int &shadowTextureWidth, int &shadowTextureHeight, GLuint &m_ShadowMapDepthStencilTextureId,
+                       GLuint &m_ShadowMapFBOId) {
+    shadowTextureWidth = 4096;
+    shadowTextureHeight = 4096;
     glGenFramebuffers(1, &m_ShadowMapFBOId);
     glBindFramebuffer(GL_FRAMEBUFFER, m_ShadowMapFBOId);
 
@@ -245,101 +339,46 @@ int main() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    float borderColor[] = {1.0f, 1.0f, 1.0f, 1.0f};
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_ShadowMapDepthStencilTextureId, 0);
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
+}
 
-    // Needed since we don't touch the color buffer
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+CubeMap *loadCubeMap() {
+    std::map<std::string, GLenum> facesToLoad = {
+            {"posx.jpg", GL_TEXTURE_CUBE_MAP_POSITIVE_X},
+            {"posy.jpg", GL_TEXTURE_CUBE_MAP_POSITIVE_Y},
+            {"posz.jpg", GL_TEXTURE_CUBE_MAP_POSITIVE_Z},
+            {"negx.jpg", GL_TEXTURE_CUBE_MAP_NEGATIVE_X},
+            {"negy.jpg", GL_TEXTURE_CUBE_MAP_NEGATIVE_Y},
+            {"negz.jpg", GL_TEXTURE_CUBE_MAP_NEGATIVE_Z},
+    };
 
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    auto *dayCubeMap = new CubeMap("resources/skybox/day/skybox_", facesToLoad);
+    return dayCubeMap;
+}
 
+void setupTextures() {
+    TextureManager::linkTexture(DIRT, "resources/textures/dirt.jpg");
+    TextureManager::linkTexture(WOOD, "resources/textures/wood.jpg");
+    TextureManager::linkTexture(LEAF, "resources/textures/leaves.jpg");
+    TextureManager::linkTexture(PLAYER, "resources/textures/steve.jpg");
+    TextureManager::linkTexture(GLOW_STONE, "resources/textures/glowstone.jpg");
+    TextureManager::linkTexture(WHITE_SHEEP, "resources/textures/sheep.jpg");
+    TextureManager::linkTexture(BROWN_VILLAGER, "resources/textures/villager.jpg");
+    TextureManager::linkTexture(GRASS, "resources/textures/grass.jpg");
+    TextureManager::linkTexture(WATER, "resources/textures/water.jpg");
+}
 
-    const glm::mat4 &lightP = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 1000.0f);
-    minecraft->light->transform->rotation = glm::vec3(-80, 0, 20);
-    minecraft->light->transform->markAsDirtyState();
-
-    const glm::mat4 &lightV = minecraft->light->getSpaceMatrix();
-    glm::mat4 lightSpaceMatrix = lightP * lightV;
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    glm::vec3 blockPos = glm::vec3(70, 0, 70);
-    GameObject *block = minecraft->world->getBlockAt(blockPos);
-    glm::vec4 frag_coord = block->transform.getModel() * glm::vec4(block->mesh->vertices.at(0).position, 1.0);
-    glm::vec4 tmp = lightP*lightV*frag_coord;
-    // print w
-    std::cout << tmp.w << std::endl;
-    std::cout << tmp.x/tmp.w << " " << tmp.y/tmp.w << " " << tmp.z/tmp.w << std::endl;
-
-    glEnable(GL_CULL_FACE);
-    int width, height;
-
-    while (!glfwWindowShouldClose(window)) {
-        minecraft->processEvents(window);
-        minecraft->updateManagers();
-
-
-        glfwPollEvents();
-        glCullFace(GL_BACK);
-        // print shadowMapFBO
-        shadowShader.use();
-        glDisable(GL_MULTISAMPLE);
-        glActiveTexture(GL_TEXTURE0);
-        glBindFramebuffer(GL_FRAMEBUFFER, m_ShadowMapFBOId);
-        glViewport(0, 0, shadowTextureWidth, shadowTextureHeight);
-        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-        glClearDepth(1.0f);
-        glClear(GL_DEPTH_BUFFER_BIT);
-
-
-        shadowShader.setMatrix4("P", lightP);
-        shadowShader.setMatrix4("V",lightV);
-
-        minecraft->render(shadowShader);
-        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-
-        glfwGetFramebufferSize(window, &width, &height);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        shader.use();
-
-        glDisable(GL_CULL_FACE);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glViewport(0, 0, width, height);
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        glClearDepth(1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-        glActiveTexture(GL_TEXTURE0+1);
-        glBindTexture(GL_TEXTURE_2D, m_ShadowMapDepthStencilTextureId);
-
-
-        shader.setMatrix4("lightSpaceMatrix", lightSpaceMatrix);
-        minecraft->configureMatrices(shader);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, dayCubeMap->textureID);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        glBindVertexArray(0);
-
-        // set u_viewPos
-        shader.setVector3f("u_view_pos",   minecraft->camera->transform.position);
-        minecraft->render(shader);
-
-
-
-        cubeMapShader.use();
-        minecraft->configureMatrices(cubeMapShader);
-        dayCubeMap->draw(cubeMapShader);
-        glfwSwapBuffers(window);
-
-    }
-
-    //clean up ressource
-    glfwDestroyWindow(window);
-    glfwTerminate();
-
-    return 0;
+void setupMeshs() {
+    MeshManager::linkMesh(BLOCK, "resources/objects/cube.obj");
+    MeshManager::linkMesh(HUMAN, "resources/objects/stevy.obj");
+    MeshManager::linkMesh(SHEEP, "resources/objects/sheep/sheep.obj");
+    MeshManager::linkMesh(VILLAGER, "resources/objects/villager.obj");
+    MeshManager::linkMesh(CUBEMAP, "resources/objects/grass.obj");
+    MeshManager::linkMesh(PLANE, "resources/objects/plane.obj");
 }
 
 Shader loadShader(const std::string &vertexPath, const std::string &fragmentPath, bool withTexture, bool withLight) {

@@ -29,6 +29,8 @@ public:
     void use(Shader &shader) const;
 
     glm::mat4 getSpaceMatrix() const;
+
+    glm::mat4 getOrthoProjectinoMatrix() const;
 };
 
 
