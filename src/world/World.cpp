@@ -19,6 +19,7 @@ World::World(std::map<std::tuple<int, int, int>, std::tuple<int, MeshType, Textu
 
 void World::create() {
 
+
     for (auto &worldBlock: worldBlocks) {
         worldBlockInstances[worldBlock.first] = new GameObject(MeshManager::getMesh(std::get<1>(worldBlock.second)));
         worldBlockInstances[worldBlock.first]->setTextureID(
@@ -30,15 +31,23 @@ void World::create() {
 }
 
 void World::makeObjects(Shader &shader) {
-    for (auto &worldBlock: worldBlockInstances) {
-        worldBlock.second->makeObject(shader);
+    std::map<GLuint, GameObject *> bases = {};
+    for (auto &worldBlockInstance: worldBlockInstances) {
+        if (bases.find(worldBlockInstance.second->textureID) == bases.end()) {
+            bases[worldBlockInstance.second->textureID] = worldBlockInstance.second;
+            worldBlockInstance.second->makeObject(shader);
+        } else {
+            worldBlockInstance.second->makeObject(shader, bases[worldBlockInstance.second->textureID]->renderer);
+        }
     }
+
 }
 
-void World::draw(Shader &shader) {
+void World::draw(Shader &shader, glm::vec3 playerPosition) {
     for (auto &worldBlockInstance: worldBlockInstances) {
-        // Print block
-        worldBlockInstance.second->draw(shader);
+        if (glm::distance(playerPosition, worldBlockInstance.second->transform.getPosition()) < 100) {
+            worldBlockInstance.second->draw(shader);
+        }
     }
 }
 
@@ -68,8 +77,8 @@ bool World::collides(GameObject *object) {
 
     std::vector<glm::vec3> collisionBox = {
             position,
-            position-glm::vec3(corner.x, 0, corner.z),
-            position+glm::vec3(corner.x, 0, corner.z),
+            position - glm::vec3(corner.x, 0, corner.z),
+            position + glm::vec3(corner.x, 0, corner.z),
     };
 
     bool didCollide = false;

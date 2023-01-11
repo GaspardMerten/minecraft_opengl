@@ -3,6 +3,7 @@
 //
 
 #include <map>
+#include <set>
 #include "../../world/World.h"
 
 
@@ -20,6 +21,7 @@ World* generateFlatWorld(int length, int width, int depth, int nbrTrees, int nbC
     int waterCenterX, waterCenterZ;
     // randomly choose the center of the water, but not too close to the edges
 
+    std::set<std::tuple<int, int>> waterPositions{};
     for (int circle = 0; circle < nbCircles; circle++) {
         waterCenterX = rand() % (length - 20) + 10;
         waterCenterZ = rand() % (width - 20) + 10;
@@ -28,6 +30,7 @@ World* generateFlatWorld(int length, int width, int depth, int nbrTrees, int nbC
         for (int i = 0; i < length; i++) {
             for (int j = 0; j < width; j++) {
                 if (pow(i - waterCenterX, 2) + pow(j - waterCenterZ, 2) < pow(waterRadius, 2)) {
+                    waterPositions.insert(std::make_tuple(i, j));
                     map[std::make_tuple(i, j, 0)] = std::make_tuple(1, MeshType::PLANE, TextureType::WATER);
                     map[std::make_tuple(i, j, -1)] = std::make_tuple(1, MeshType::CUBEMAP, TextureType::DIRT);
                 }
@@ -52,6 +55,12 @@ World* generateFlatWorld(int length, int width, int depth, int nbrTrees, int nbC
     for (int i = 0; i < nbrTrees; i++) {
         int x = rand() % length;
         int y = rand() % width;
+
+        // prevent trees from spawning on water
+        if (waterPositions.find(std::make_tuple(x, y)) != waterPositions.end()) {
+            continue;
+        }
+
         for(int j = 0; j < 5; j++) {
             map[std::make_tuple(x, y, j)] = std::make_tuple(1, MeshType::BLOCK, TextureType::WOOD);;
         }

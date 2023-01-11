@@ -26,13 +26,13 @@ public:
 
     void create();
 
-    void draw(Shader& shader);
-
     void makeObjects(Shader &shader);
 
     bool collides(GameObject* object);
 
     GameObject *getBlockAt(glm::vec3 &vec);
+
+    void draw(Shader &shader, glm::vec3 playerPosition);
 };
 
 

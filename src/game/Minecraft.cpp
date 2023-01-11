@@ -84,7 +84,7 @@ void Minecraft::render(Shader &shader) {
         light->use(shader);
     }
 
-    world->draw(shader);
+    world->draw(shader, player->transform.getPosition());
     player->draw(shader);
 
     for (auto &gameObject : toRender) {

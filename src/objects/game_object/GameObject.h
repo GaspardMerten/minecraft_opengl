@@ -37,6 +37,8 @@ public:
     void setCollider(Collider newCollider);
 
     void setPhysicsData(PhysicsData newPhysicsData);
+
+    void makeObject(Shader shader, Renderer renderer);
 };
 
 

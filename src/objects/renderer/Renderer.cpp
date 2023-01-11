@@ -64,3 +64,9 @@ void Renderer::makeObject(Shader &shader, Mesh *mesh, Transform &transform) {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 }
+
+void Renderer::makeObject(Shader shader, Mesh *pMesh, Transform transform, Renderer renderer) {
+    VAO = renderer.VAO;
+    VBO = renderer.VBO;
+    makeObject(shader, pMesh, transform);
+}
