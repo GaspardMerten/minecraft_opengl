@@ -1,6 +1,7 @@
-#version 420 core
-layout(binding=0) uniform sampler2D tex;
-layout(binding=1) uniform sampler2D shadowMap;
+#version 330 core
+
+uniform sampler2D tex;
+uniform sampler2D shadowMap;
 
 out vec4 FragColor;
 precision mediump float;
