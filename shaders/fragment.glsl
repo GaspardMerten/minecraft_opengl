@@ -1,7 +1,6 @@
-#version 330 core
-
-uniform sampler2D tex;
-uniform sampler2D shadowMap;
+#version 420 core
+layout(binding=0) uniform sampler2D tex;
+layout(binding=1) uniform sampler2D shadowMap;
 
 out vec4 FragColor;
 precision mediump float;
@@ -69,11 +68,13 @@ float calculateShadowIntensity(vec4 shadowPos)
 void main() {
     vec3 N = normalize(v_normal);
     vec3 L = normalize(light.light_pos - v_frag_coord);
+    vec3 V = normalize(u_view_pos - v_frag_coord);
 
+    float specular = speculatCalculation(N, L, V);
     float diffuse = light.diffuse_strength * max(dot(N, L), 0.0);
     float distance = length(light.light_pos - v_frag_coord);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
-    float light = light.ambient_strength + diffuse * attenuation;
+    float light = light.ambient_strength + diffuse * attenuation + specular * attenuation;
 
     FragColor = texture(tex, v_t) * vec4(vec3(light), 1.0);
 

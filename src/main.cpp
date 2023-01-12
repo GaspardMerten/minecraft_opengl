@@ -232,7 +232,7 @@ int main() {
 
 
     const glm::mat4 &lightV = minecraft->light->getSpaceMatrix();
-    const glm::mat4 &lightP = minecraft->light->getOrthoProjectinoMatrix();
+    const glm::mat4 &lightP = minecraft->light->getOrthoProjectionMatrix();
     glm::mat4 lightSpaceMatrix = lightP * lightV;
 
     int width, height;

@@ -38,7 +38,7 @@ void Light::linkShader(Shader& shader) const {
 glm::mat4 Light::getSpaceMatrix() const {
     return glm::inverse(transform->getModel());
 }
-glm::mat4 Light::getOrthoProjectinoMatrix() const {
+glm::mat4 Light::getOrthoProjectionMatrix() {
     return glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, 0.1f, 1000.0f);
 }
 

@@ -28,7 +28,7 @@ void PlayerControls::processEvents(GLFWwindow *window) {
         // space to jump
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
             if (player->physicsData.velocity == 0 && player->physicsData.acceleration == 0) {
-            player->physicsData.acceleration = 0.075;
+            player->physicsData.velocity = 0.12;
             }
         }
         // shift to go down

@@ -30,7 +30,7 @@ public:
 
     glm::mat4 getSpaceMatrix() const;
 
-    glm::mat4 getOrthoProjectinoMatrix() const;
+    static glm::mat4 getOrthoProjectionMatrix() ;
 };
 
 

@@ -52,8 +52,16 @@ void World::draw(Shader &shader, glm::vec3 playerPosition) {
 }
 
 GameObject *World::getBlockAt(glm::vec3 &vec) {
-    const std::map<std::tuple<int, int, int>, GameObject *>::iterator &findIterator = worldBlockInstances.find(
-            std::make_tuple(vec.x, vec.z, vec.y));
+    std::map<std::tuple<int, int, int>, GameObject *>::iterator findIterator;
+    if (vec.y < 0) {
+        findIterator = worldBlockInstances.find(
+                std::make_tuple(vec.x, vec.z, vec.y - 1));
+
+    } else {
+        findIterator = worldBlockInstances.find(
+                std::make_tuple(vec.x, vec.z, vec.y));
+
+    }
 
     if (findIterator != worldBlockInstances.end()) {
         return findIterator->second;

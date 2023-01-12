@@ -27,7 +27,7 @@ Minecraft::Minecraft(int width, int height, int depth, int nbrTrees, int nbCircl
     playerControls = new PlayerControls(player, *camera, *world);
     double size = 0.6;
 
-    for (int i = 0; i < 15; i++) {
+    for (int i = 0; i < 0; i++) {
         if (i > 10) {
             size = 0.3;
         }
@@ -42,7 +42,7 @@ Minecraft::Minecraft(int width, int height, int depth, int nbrTrees, int nbCircl
     }
 
     size = 2;
-    for (int i = 0; i < 15; i++) {
+    for (int i = 0; i < 0; i++) {
         if (i > 10) {
             size = 1.5;
         }
@@ -64,11 +64,11 @@ Minecraft::Minecraft(int width, int height, int depth, int nbrTrees, int nbCircl
             glm::vec3(50, 100, 50),
             glm::vec3(0.0, 0.0, 0.0),
             0.5,
-            0.8,
+            0, // no specular in minecraft
             1,
             5.0,
-            0.00000014,
-            0,
+            0.0014,
+            0.00001,
             1.0
     );
 
