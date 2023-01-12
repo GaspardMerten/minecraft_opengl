@@ -20,6 +20,8 @@ World::World(std::map<std::tuple<int, int, int>, std::tuple<int, MeshType, Textu
 void World::create() {
 
     for (auto &worldBlock: worldBlocks) {
+        // print blockPos
+        std::cout << "Block created at " << std::get<0>(worldBlock.first) << " " << std::get<1>(worldBlock.first) << " " << std::get<2>(worldBlock.first) << std::endl;
         worldBlockInstances[worldBlock.first] = new GameObject(MeshManager::getMesh(std::get<1>(worldBlock.second)));
         worldBlockInstances[worldBlock.first]->setTextureID(
                 TextureManager::getTextureID(std::get<2>(worldBlock.second)));
@@ -83,3 +85,61 @@ bool World::collides(GameObject *object) {
 
     return didCollide;
 }
+
+void World::removeBlock(glm::vec3 blockPos) {
+    worldBlockInstances.erase(std::make_tuple(blockPos.x, blockPos.z, blockPos.y));
+}
+
+float World::normalizeAngle(float angle) {
+    while (angle < 0) angle += 360;
+    while (angle >= 360) angle -= 360;
+    return angle;
+}
+
+glm::vec3 World::rayCastingBlockPos(glm::vec3 playerPos, glm::vec3 playerRot) {
+    float normalizedRotY = normalizeAngle(playerRot.y);
+    glm::vec3 rayCastingBlockPos = playerPos;
+
+    // if rayCastingBlockPos is between 0 and 180
+    if (normalizedRotY >= 0 && normalizedRotY < 45) {
+        rayCastingBlockPos += glm::vec3(0, 3, 1);
+    }
+    // between 45 and 135
+    else if (normalizedRotY >= 45 && normalizedRotY < 135) {
+        rayCastingBlockPos += glm::vec3(-2, 3, 0);
+    }
+    // between 135 and 225
+    else if (normalizedRotY >= 135 && normalizedRotY < 225) {
+        rayCastingBlockPos += glm::vec3(0, 3, 2);
+    }
+    // between 255 and 315
+    else if (normalizedRotY >= 225 && normalizedRotY < 315) {
+        rayCastingBlockPos += glm::vec3(2, 3, 0);
+    }
+    // between 315 and 360
+    else if (normalizedRotY >= 315 && normalizedRotY < 360) {
+        rayCastingBlockPos += glm::vec3(0, 3, -2);
+    }
+
+    // print rayCastingBlockPos
+    std::cout << "RayCastingBlockPos: " << rayCastingBlockPos.x << " " << rayCastingBlockPos.z << " " << rayCastingBlockPos.y << std::endl;
+    // get the lowest block
+    return rayCastingGetLowestBlock(rayCastingBlockPos);
+
+
+}
+
+glm::vec3 World::rayCastingGetLowestBlock(glm::vec3 groundPos) {
+    // Check if there is a block at groundPos
+    int i = 0;
+    while(worldBlockInstances.count(std::make_tuple(groundPos.x, groundPos.z, groundPos.y)) != 1  && i < 10) {
+        // print this positing : block fpound at
+        std::cout << "Block not found at " << groundPos.x << " " << groundPos.z << " " << groundPos.y << std::endl;
+        // while there is a block, go down
+        groundPos.y -= 1;
+        i++;
+    }
+    return groundPos;
+}
+
+

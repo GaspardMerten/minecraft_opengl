@@ -35,6 +35,29 @@ void PlayerControls::processEvents(GLFWwindow *window) {
         if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
             player->transform.translate(0, -1, 0);
         }
+
+        // check if left click
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+            // get y rotation
+            float yRotation = world.normalizeAngle(player->transform.rotation.y);
+            // normalize y rotation for it to be between 0 and 360 degrees
+            //  one block in front           glm::vec3 blockPos = player->transform.position + glm::vec3(1, -1, 0);
+            // get block in front of player
+            glm::vec3 blockPos = world.rayCastingBlockPos(player->transform.position, player->transform.rotation);
+            // round blockPos
+            //blockPos = player->transform.position + glm::vec3(1, -1, 0);
+            blockPos.x = round(blockPos.x);
+            blockPos.y = round(blockPos.y);
+            blockPos.z = round(blockPos.z);
+            // remove block
+            world.removeBlock(blockPos);
+            //print blockPos
+            std::cout << "Block removed at " << blockPos.x << " " << blockPos.z << " " << blockPos.y << std::endl;
+            // print player position and then rotation
+            std::cout << "Player position: " << player->transform.position.x << " " << player->transform.position.z << " " << player->transform.position.y << std::endl;
+            std::cout << "Player rotation: " << world.normalizeAngle(player->transform.rotation.y) << std::endl;
+
+        }
     }
 
     // rotate if pressing left alt
@@ -75,3 +98,5 @@ void PlayerControls::processMouse(GLFWwindow *window) {
     lastX = windowWidth / 2;
     lastY = windowHeight / 2;
 }
+
+

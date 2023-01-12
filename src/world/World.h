@@ -26,7 +26,15 @@ public:
 
     void create();
 
+    float normalizeAngle(float angle);
+
+    glm::vec3 rayCastingBlockPos(glm::vec3 playerPos, glm::vec3 playerRot);
+
+    glm::vec3 rayCastingGetLowestBlock(glm::vec3 groundPos);
+
     void draw(Shader& shader);
+
+    void removeBlock(glm::vec3 blockPos);
 
     void makeObjects(Shader &shader);
 
