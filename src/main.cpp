@@ -240,7 +240,7 @@ int main(int argc, char *argv[]) {
 
     while (!glfwWindowShouldClose(window)) {
         n+=1;
-        minecraft->processEvents(window);
+        minecraft->processEvents(window, shader);
 
         glm::vec4 computed = lightSpaceMatrix*minecraft->player->transform.getModel()*glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 

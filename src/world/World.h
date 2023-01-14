@@ -22,7 +22,10 @@ public:
 public:
     int width{}, length{}, depth{};
 
+
     std::map<std::tuple<int, int, int>, std::tuple<int, MeshType, TextureType>> worldBlocks;
+
+
 
     void create();
 
@@ -30,17 +33,22 @@ public:
 
     glm::vec3 rayCastingBlockPos(glm::vec3 playerPos, glm::vec3 playerRot);
 
-    glm::vec3 rayCastingGetLowestBlock(glm::vec3 groundPos);
+    glm::vec3 rayCastingGetLowestBlock(glm::vec3 playerPos, glm::vec3 playerRot);
+
+    glm::vec3 rayCastingGetHighestBlock(glm::vec3 playerPos, glm::vec3 playerRot);
 
     void draw(Shader& shader);
 
     void removeBlock(glm::vec3 blockPos);
+
 
     void makeObjects(Shader &shader);
 
     bool collides(GameObject* object);
 
     GameObject *getBlockAt(glm::vec3 &vec);
+
+    void addBlock(glm::vec3 blockPos, Shader &shader);
 };
 
 

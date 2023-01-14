@@ -124,12 +124,13 @@ glm::vec3 World::rayCastingBlockPos(glm::vec3 playerPos, glm::vec3 playerRot) {
     // print rayCastingBlockPos
     std::cout << "RayCastingBlockPos: " << rayCastingBlockPos.x << " " << rayCastingBlockPos.z << " " << rayCastingBlockPos.y << std::endl;
     // get the lowest block
-    return rayCastingGetLowestBlock(rayCastingBlockPos);
+    return (rayCastingBlockPos);
 
 
 }
 
-glm::vec3 World::rayCastingGetLowestBlock(glm::vec3 groundPos) {
+glm::vec3 World::rayCastingGetLowestBlock(glm::vec3 playerPos, glm::vec3 playerRot) {
+    glm::vec3 groundPos = rayCastingBlockPos(playerPos, playerRot);
     // Check if there is a block at groundPos
     int i = 0;
     while(worldBlockInstances.count(std::make_tuple(groundPos.x, groundPos.z, groundPos.y)) != 1  && i < 10) {
@@ -137,6 +138,36 @@ glm::vec3 World::rayCastingGetLowestBlock(glm::vec3 groundPos) {
         std::cout << "Block not found at " << groundPos.x << " " << groundPos.z << " " << groundPos.y << std::endl;
         // while there is a block, go down
         groundPos.y -= 1;
+        i++;
+    }
+    return groundPos;
+}
+
+void World::addBlock(glm::vec3 blockPos, Shader &shader) {
+    // insert into worldBlocks
+    if(!worldBlockInstances.count(std::make_tuple(blockPos.x, blockPos.z, blockPos.y))){
+        // No block at this position, can add the block at blockPos
+        worldBlockInstances[std::make_tuple(blockPos.x, blockPos.z, blockPos.y)] = new GameObject(MeshManager::getMesh(MeshType::BLOCK));
+        worldBlockInstances[std::make_tuple(blockPos.x, blockPos.z, blockPos.y)]->setTextureID(TextureManager::getTextureID(TextureType::DIRT));
+        worldBlockInstances[std::make_tuple(blockPos.x, blockPos.z, blockPos.y)]->transform.setPosition(blockPos.x, blockPos.z, blockPos.y);
+
+        // make object and draw
+        worldBlockInstances[std::make_tuple(blockPos.x, blockPos.z, blockPos.y)]->makeObject(shader);
+        worldBlockInstances[std::make_tuple(blockPos.x, blockPos.z, blockPos.y)]->draw(shader);
+
+
+    }
+
+}
+
+glm::vec3 World::rayCastingGetHighestBlock(glm::vec3 playerPos, glm::vec3 playerRot) {
+    glm::vec3 groundPos = rayCastingBlockPos(playerPos, playerRot) + glm::vec3(0, -3, 0);
+    // Check if there is a block at groundPos
+    int i = 0;
+    while(worldBlockInstances.count(std::make_tuple(groundPos.x, groundPos.z, groundPos.y)) == 1  && i < 10) {
+        // print this positing : block fpound at
+        // while there is a block, go down
+        groundPos.y += 1;
         i++;
     }
     return groundPos;
