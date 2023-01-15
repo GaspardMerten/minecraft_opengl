@@ -67,13 +67,12 @@ void PlayerControls::processEvents(GLFWwindow *window, Shader &shader) {
             //  one block in front           glm::vec3 blockPos = player->transform.position + glm::vec3(1, -1, 0);
             // get block in front of player
             glm::vec3 blockPos = world.rayCastingGetHighestBlock(player->transform.position, player->transform.rotation);
-            blockPos = player->transform.position + glm::vec3(1, 0, 0);
+
             // round blockPos
             blockPos.x = round(blockPos.x);
             blockPos.y = round(blockPos.y);
             blockPos.z = round(blockPos.z);
             // add block
-
             world.addBlock(blockPos, shader);
             //print blockPos
             std::cout << "Block added at " << blockPos.x << " " << blockPos.z << " " << blockPos.y << std::endl;
