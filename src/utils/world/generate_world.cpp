@@ -7,24 +7,16 @@
 #include "../../world/World.h"
 
 
-World* generateFlatWorld(int length, int width, int depth, int nbrTrees, int nbCircles) {
+World *generateFlatWorld(int length, int width, int depth, int nbrTrees, int nbCircles) {
     std::map<std::tuple<int, int, int>, std::tuple<int, MeshType, TextureType>> map;
-
-    for (int i = 0; i < length; i++) {
-        for (int j = 0; j < width; j++) {
-            for (int k = 0; k < depth; k++) {
-                map[std::make_tuple(i, j, -k)] = std::make_tuple(1, MeshType::CUBEMAP, TextureType::GRASS);
-            }
-        }
-    }
-
     int waterCenterX, waterCenterZ;
-    // randomly choose the center of the water, but not too close to the edges
 
+    // randomly choose the center of the water, but not too close to the edges
     std::set<std::tuple<int, int>> waterPositions{};
     for (int circle = 0; circle < nbCircles; circle++) {
         waterCenterX = rand() % (length - 20) + 10;
         waterCenterZ = rand() % (width - 20) + 10;
+
         int waterRadius = rand() % 5 + 5;
 
         for (int i = 0; i < length; i++) {
@@ -38,6 +30,31 @@ World* generateFlatWorld(int length, int width, int depth, int nbrTrees, int nbC
         }
     }
 
+    int collineCenterX = length * rand() / RAND_MAX;
+    int collineCenterZ = width * rand() / RAND_MAX;
+    float collineRadius = 10 + 10 * rand() / RAND_MAX;
+
+
+    std::map<std::tuple<int,int>, int> colline = std::map<std::tuple<int, int>, int>();
+
+    for (int i = 0; i < length; i++) {
+        for (int j = 0; j < width; j++) {
+            const auto distance = glm::distance(glm::vec2(i, j),
+                                                                  glm::vec2(collineCenterX, collineCenterZ));
+            if (distance <= collineRadius) {
+                colline[std::make_tuple(i, j)] = collineRadius-distance;
+                map[std::make_tuple(i, j, collineRadius-distance)] = std::make_tuple(1, MeshType::CUBEMAP, TextureType::GRASS);
+            } else {
+                for (int k = 0; k < depth; k++) {
+                    // if in the colline, add depth
+
+                    map[std::make_tuple(i, j, -k)] = std::make_tuple(1, MeshType::CUBEMAP, TextureType::GRASS);
+                }
+            }
+        }
+    }
+
+
 
 
     // add higher blocks only  on the edges
@@ -48,7 +65,7 @@ World* generateFlatWorld(int length, int width, int depth, int nbrTrees, int nbC
     // add higher blocks only  on the edges
     for (int i = 0; i < width; i++) {
         map[std::make_tuple(length, i, 1)] = std::make_tuple(1, MeshType::BLOCK, TextureType::DIRT);;
-        map[std::make_tuple(0, i, 1)] = std::make_tuple(1,MeshType::BLOCK, TextureType::DIRT);;
+        map[std::make_tuple(0, i, 1)] = std::make_tuple(1, MeshType::BLOCK, TextureType::DIRT);;
     }
 
     // add little trees randomly
@@ -61,22 +78,28 @@ World* generateFlatWorld(int length, int width, int depth, int nbrTrees, int nbC
             continue;
         }
 
-        for(int j = 0; j < 5; j++) {
-            map[std::make_tuple(x, y, j)] = std::make_tuple(1, MeshType::BLOCK, TextureType::WOOD);;
+        int startBlockHeight = 0;
+
+        if (colline.find(std::make_tuple(x, y)) != colline.end()) {
+            startBlockHeight = colline[std::make_tuple(x, y)];
+        }
+
+        for (int j = 0; j < 5; j++) {
+            map[std::make_tuple(x, y, j+startBlockHeight)] = std::make_tuple(1, MeshType::BLOCK, TextureType::WOOD);;
         }
 
         // Leaves
-        for(int j = 0; j < 5; j++) {
-            for(int k = 0; k < 5; k++) {
-                map[std::make_tuple(x - 2 + j, y - 2 + k, 5)] = std::make_tuple(1, MeshType::BLOCK, TextureType::LEAF);;
+        for (int j = 0; j < 5; j++) {
+            for (int k = 0; k < 5; k++) {
+                map[std::make_tuple(x - 2 + j, y - 2 + k, 5+startBlockHeight)] = std::make_tuple(1, MeshType::BLOCK, TextureType::LEAF);;
             }
         }
-        for(int j = 0; j < 3; j++) {
-            for(int k = 0; k < 3; k++) {
-                map[std::make_tuple(x - 1 + j, y - 1 + k, 6)] = std::make_tuple(1, MeshType::BLOCK, TextureType::LEAF);;
+        for (int j = 0; j < 3; j++) {
+            for (int k = 0; k < 3; k++) {
+                map[std::make_tuple(x - 1 + j, y - 1 + k, 6+startBlockHeight)] = std::make_tuple(1, MeshType::BLOCK, TextureType::LEAF);;
             }
         }
-        map[std::make_tuple(x, y, 7)] = std::make_tuple(1, MeshType::BLOCK, TextureType::LEAF);;
+        map[std::make_tuple(x, y, 7+startBlockHeight)] = std::make_tuple(1, MeshType::BLOCK, TextureType::LEAF);;
 
 
     }

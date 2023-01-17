@@ -21,13 +21,13 @@ Minecraft::Minecraft(int width, int height, int depth, int nbrTrees, int nbCircl
     player = new GameObject(MeshManager::getMesh(MeshType::HUMAN));
     player->setTextureID(TextureManager::getTextureID(TextureType::PLAYER));
     player->transform.setPosition(playerSpawn.x, playerSpawn.y, playerSpawn.z);
-    player->collider = Collider{0.1f, 0.1f, 0.5f};
+    player->collider = Collider{0.2f, 0.2f, 1.0f};
     camera = new Camera(player->transform);
     cameraControls = new CameraControls(*camera, window);
     playerControls = new PlayerControls(player, *camera, *world);
     double size = 0.6;
 
-    for (int i = 0; i < 0; i++) {
+    for (int i = 0; i < 20; i++) {
         if (i > 10) {
             size = 0.3;
         }
@@ -42,7 +42,7 @@ Minecraft::Minecraft(int width, int height, int depth, int nbrTrees, int nbCircl
     }
 
     size = 2;
-    for (int i = 0; i < 0; i++) {
+    for (int i = 0; i < 20; i++) {
         if (i > 10) {
             size = 1.5;
         }

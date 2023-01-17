@@ -71,8 +71,6 @@ GameObject *World::getBlockAt(glm::vec3 &vec) {
 
 bool World::collides(GameObject *object) {
     glm::vec3 position = object->transform.position;
-    position.x += 0.25f;
-    position.z += 0.25f;
 
     glm::vec3 corner = glm::vec3(object->collider.length / 2,
                                  0,
@@ -87,6 +85,11 @@ bool World::collides(GameObject *object) {
             position,
             position - glm::vec3(corner.x, 0, corner.z),
             position + glm::vec3(corner.x, 0, corner.z),
+            position + glm::vec3(-corner.x, 0, corner.z),
+            position + glm::vec3(corner.x, 0, -corner.z),
+            position + glm::vec3(corner.x, 0.05, corner.z),
+            position + glm::vec3(-corner.x, 0.05, corner.z),
+            position + glm::vec3(corner.x, 0.05, -corner.z),
     };
 
     bool didCollide = false;
