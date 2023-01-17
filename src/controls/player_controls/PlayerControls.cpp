@@ -28,7 +28,7 @@ void PlayerControls::processEvents(GLFWwindow *window, Shader &shader) {
         // space to jump
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
             if (player->physicsData.velocity == 0 && player->physicsData.acceleration == 0) {
-            player->physicsData.velocity = 0.2;
+                player->physicsData.velocity = 0.2;
             }
         }
         // shift to go down
@@ -38,6 +38,7 @@ void PlayerControls::processEvents(GLFWwindow *window, Shader &shader) {
 
         // check if left click
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+
             // Removing block
             float yRotation = world.normalizeAngle(player->transform.rotation.y);
             // normalize y rotation for it to be between 0 and 360 degrees
@@ -54,31 +55,40 @@ void PlayerControls::processEvents(GLFWwindow *window, Shader &shader) {
             //print blockPos
             std::cout << "Block removed at " << blockPos.x << " " << blockPos.z << " " << blockPos.y << std::endl;
             // print player position and then rotation
-            std::cout << "Player position: " << player->transform.position.x << " " << player->transform.position.z << " " << player->transform.position.y << std::endl;
+            std::cout << "Player position: " << player->transform.position.x << " " << player->transform.position.z
+                      << " " << player->transform.position.y << std::endl;
             std::cout << "Player rotation: " << world.normalizeAngle(player->transform.rotation.y) << std::endl;
 
         }
         // check if right click
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-            // Adding block
-            // get y rotation
-            float yRotation = world.normalizeAngle(player->transform.rotation.y);
-            // normalize y rotation for it to be between 0 and 360 degrees
-            //  one block in front           glm::vec3 blockPos = player->transform.position + glm::vec3(1, -1, 0);
-            // get block in front of player
-            glm::vec3 blockPos = world.rayCastingGetHighestBlock(player->transform.position, player->transform.rotation);
+            if (camera.firstPerson) {
+                glm::mat4 rotationMatrix = glm::identity<glm::mat4>();
+                rotationMatrix = glm::rotate(rotationMatrix, glm::radians(camera.firstPersonRotation), glm::vec3(1, 0, 0));
+                rotationMatrix = glm::rotate(rotationMatrix, glm::radians(player->transform.rotation.y), glm::vec3(0, 1, 0));
+                glm::vec3 direction = glm::vec3(rotationMatrix * glm::vec4(0, 0, 1, 0));
+                direction = glm::normalize(direction);
+                const int STEP_PER_UNIT = 10;
+                direction =  (1.f / (float) STEP_PER_UNIT) * direction;
+                glm::vec3 currentPoint = player->transform.position + camera.firstPersonDelta;
 
-            // round blockPos
-            blockPos.x = round(blockPos.x);
-            blockPos.y = round(blockPos.y);
-            blockPos.z = round(blockPos.z);
-            // add block
-            world.addBlock(blockPos, shader);
-            //print blockPos
-            std::cout << "Block added at " << blockPos.x << " " << blockPos.z << " " << blockPos.y << std::endl;
-            // print player position and then rotation
-            std::cout << "Player position: " << player->transform.position.x << " " << player->transform.position.z << " " << player->transform.position.y << std::endl;
-            std::cout << "Player rotation: " << world.normalizeAngle(player->transform.rotation.y) << std::endl;
+                bool  found = false;
+
+                std::cout << "startPoint: " << currentPoint.x << " " << currentPoint.y << " " << currentPoint.z << std::endl;
+
+                for (int i = 0; i < 10*STEP_PER_UNIT; i++) {
+                    currentPoint = currentPoint + direction;
+                    if (world.getBlockAt(currentPoint) != nullptr) {
+                        found = true;
+                        std::cout << "Block found at " << currentPoint.x << " " << currentPoint.y << " " << currentPoint.z << std::endl;
+                        break;
+                    }
+                }
+
+                if (found) {
+                    world.addBlock(currentPoint - direction, shader);
+                }
+            }
         }
     }
 

@@ -11,7 +11,6 @@
 
 
 class Camera {
-    bool firstPerson = false;
 
 public:
     explicit Camera(Transform &transform);
@@ -28,6 +27,8 @@ public:
 
     float firstPersonRotation = 0;
 
+    bool firstPerson = false;
+    const glm::vec3 firstPersonDelta = glm::vec3(0, 2, -0.5);
 };
 
 

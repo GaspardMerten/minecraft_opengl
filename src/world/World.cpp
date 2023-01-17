@@ -58,11 +58,11 @@ GameObject *World::getBlockAt(glm::vec3 &vec) {
     std::map<std::tuple<int, int, int>, GameObject *>::iterator findIterator;
     if (vec.y < 0) {
         findIterator = worldBlockInstances.find(
-                std::make_tuple(vec.x, vec.z, vec.y - 1));
+                std::make_tuple((int) vec.x, (int) vec.z, (int) vec.y - 1));
 
     } else {
         findIterator = worldBlockInstances.find(
-                std::make_tuple(vec.x, vec.z, vec.y));
+                std::make_tuple((int) vec.x, (int) vec.z, (int) vec.y));
 
     }
 
@@ -218,14 +218,15 @@ glm::vec3 World::rayCastingGetLowestBlock(glm::vec3 playerPos, glm::vec3 playerR
 
 void World::addBlock(glm::vec3 blockPos, Shader &shader) {
     // insert into worldBlocks
-    if(!worldBlockInstances.count(std::make_tuple(blockPos.x, blockPos.z, blockPos.y))){
+    const std::tuple<int, int, int> &x = std::make_tuple((int) blockPos.x, (int) blockPos.z, (int) blockPos.y);
+    if(!worldBlockInstances.count(x)){
         // No block at this position, can add the block at blockPos
-        worldBlockInstances[std::make_tuple(blockPos.x, blockPos.z, blockPos.y)] = new GameObject(MeshManager::getMesh(MeshType::BLOCK));
-        worldBlockInstances[std::make_tuple(blockPos.x, blockPos.z, blockPos.y)]->setTextureID(TextureManager::getTextureID(TextureType::DIRT));
-        worldBlockInstances[std::make_tuple(blockPos.x, blockPos.z, blockPos.y)]->transform.setPosition(blockPos.x, blockPos.y, blockPos.z);
+        worldBlockInstances[x] = new GameObject(MeshManager::getMesh(MeshType::BLOCK));
+        worldBlockInstances[x]->setTextureID(TextureManager::getTextureID(TextureType::DIRT));
+        worldBlockInstances[x]->transform.setPosition((int) blockPos.x, (int) blockPos.y, (int) blockPos.z);
 
         // make object and draw
-        worldBlockInstances[std::make_tuple(blockPos.x, blockPos.z, blockPos.y)]->makeObject(shader);
+        worldBlockInstances[x]->makeObject(shader);
 
 
     }

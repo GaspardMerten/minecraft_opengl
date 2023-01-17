@@ -31,9 +31,7 @@ void CameraControls::processEvents(GLFWwindow* glfWindow) {
 
 
     float windowCenter = (float) windowHeight / 2;
-    std::cout << "windowCenter: " << windowCenter << std::endl;
     camera.firstPersonRotation  += (windowCenter - ((float) y)) * mouseSensitivity;
-    std::cout << "camera.firstPersonRotation: " << camera.firstPersonRotation << std::endl;
      if (camera.firstPersonRotation  > 90) {
          camera.firstPersonRotation  = 90;
      } else if (camera.firstPersonRotation  < -90) {
