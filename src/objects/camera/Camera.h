@@ -25,6 +25,9 @@ public:
     static float zoom;
 
     void toggleFirstPerson();
+
+    float firstPersonRotation = 0;
+
 };
 
 

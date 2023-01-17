@@ -21,6 +21,7 @@ private:
 
     Camera &camera;
     GLFWwindow *window;
+    float mouseSensitivity = 0.05;
 };
 
 

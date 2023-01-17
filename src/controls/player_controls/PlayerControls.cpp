@@ -118,7 +118,6 @@ void PlayerControls::processMouse(GLFWwindow *window) {
 
 
     lastX = windowWidth / 2;
-    lastY = windowHeight / 2;
 }
 
 

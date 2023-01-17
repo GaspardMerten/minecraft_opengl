@@ -101,8 +101,8 @@ void Minecraft::linkShader(Shader &shader) {
 }
 
 void Minecraft::processEvents(GLFWwindow *window, Shader &shader) {
-    playerControls->processEvents(window, shader);
     cameraControls->processEvents(window);
+    playerControls->processEvents(window, shader);
 }
 
 void Minecraft::configureMatrices(Shader &shader) const {
