@@ -22,7 +22,6 @@ void World::create() {
 
     for (auto &worldBlock: worldBlocks) {
         // print blockPos
-        std::cout << "Block created at " << std::get<0>(worldBlock.first) << " " << std::get<1>(worldBlock.first) << " " << std::get<2>(worldBlock.first) << std::endl;
         worldBlockInstances[worldBlock.first] = new GameObject(MeshManager::getMesh(std::get<1>(worldBlock.second)));
         worldBlockInstances[worldBlock.first]->setTextureID(
                 TextureManager::getTextureID(std::get<2>(worldBlock.second)));
