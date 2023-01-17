@@ -8,7 +8,6 @@
 #include "glm/gtc/quaternion.hpp"
 
 #include <utility>
-#include <array>
 
 const int FIELD_OF_VIEW = 100;
 
@@ -76,71 +75,15 @@ GameObject *World::getBlockAt(glm::vec3 &vec) {
 bool World::collides(GameObject *object) {
     glm::vec3 position = object->transform.position;
 
-
+    glm::vec3 corner = glm::vec3(object->collider.length / 2,
+                                 0,
+                                 object->collider.width / 2);
 
     // rotate the corner according to object's rotation
-    //glm::mat4 rot = glm::rotate(glm::mat4(1), glm::radians(object->transform.rotation.y), glm::vec3(.0f, 1.0f, 0.0f));
-
-    //glm::vec3 rotatedCorner = rot * glm::vec4(corner, 1.0f);
-
-
-    // calculate the corner positions
-    std::array<glm::vec3, 8> corners = {
-            glm::vec3( object->collider.length/2,  object->collider.height/2,  object->collider.width/2),
-            glm::vec3(-object->collider.length/2,  object->collider.height/2,  object->collider.width/2),
-            glm::vec3( object->collider.length/2,  object->collider.height/2, -object->collider.width/2),
-            glm::vec3(-object->collider.length/2,  object->collider.height/2, -object->collider.width/2),
-            glm::vec3( object->collider.length/2, -object->collider.height/2,  object->collider.width/2),
-            glm::vec3(-object->collider.length/2, -object->collider.height/2,  object->collider.width/2),
-            glm::vec3(object-> collider.length/2, -object->collider.height/2, -object->collider.width/2),
-            glm::vec3(-object->collider.length/2, -object->collider.height/2, -object->collider.width/2)
-    };
-
-    // rotate all corner positions
     glm::mat4 rot = glm::rotate(glm::mat4(1), glm::radians(object->transform.rotation.y), glm::vec3(.0f, 1.0f, 0.0f));
-    for(int i=0; i<8; i++)
-    {
-        glm::vec4 rotated_corner = rot * glm::vec4(corners[i], 1.0f);
-        corners[i] = position + glm::vec3(rotated_corner);
-    }
 
-    // We now have the correct corners of the hitbox
+    glm::vec3 rotatedCorner = rot * glm::vec4(corner, 1.0f);
 
-    // create a bounding box for the object's collision box
-    glm::vec3 min = corners[0];
-    glm::vec3 max = corners[0];
-    for (int i = 1; i < 8; i++) {
-        min.x = floor(std::min(min.x, corners[i].x));
-        min.y = floor(std::min(min.y, corners[i].y));
-        min.z = floor(std::min(min.z, corners[i].z));
-        max.x = ceil(std::max(max.x, corners[i].x));
-        max.y = ceil(std::max(max.y, corners[i].y));
-        max.z = ceil(std::max(max.z, corners[i].z));
-    }
-    // check if any block around the player
-    // make an array of all the blocks around the player
-    // print position
-    std::cout << "Player position: " << position.x << " " << position.y << " " << position.z << std::endl;
-    std::cout << "Min: " << min.x << " " << min.y << " " << min.z << std::endl;
-    std::cout << "Max: " << max.x << " " << max.y << " " << max.z << std::endl;
-    // check if any block within the bounding box intersects with the object's collision box
-    for (int x = min.x; x <= max.x; x++) {
-        for (int y = min.y = 1; y <= max.y; y++) { // only check blocks above the player
-            for (int z = min.z; z <= max.z; z++) {
-                glm::vec3 blockPos = glm::vec3(x, y, z);
-                // if block is under the player
-                if (y < position.y) {
-                    if (getBlockAt(blockPos) != nullptr) {
-                        return true;
-                    }
-                }
-
-            }
-        }
-    }
-
-    return false;
-    /*
     std::vector<glm::vec3> collisionBox = {
             position,
             position - glm::vec3(corner.x, 0, corner.z),
@@ -162,7 +105,7 @@ bool World::collides(GameObject *object) {
         }
     }
 
-    return didCollide;*/
+    return didCollide;
 }
 
 void World::removeBlock(glm::vec3 blockPos) {
