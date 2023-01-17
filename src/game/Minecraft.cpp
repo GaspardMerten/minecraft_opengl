@@ -15,7 +15,7 @@ Minecraft::Minecraft(int width, int height, int depth, int nbrTrees, glm::vec3 p
     player = new GameObject(MeshManager::getMesh(MeshType::HUMAN));
     player->setTextureID(TextureManager::getTextureID(TextureType::PLAYER));
     player->transform.setPosition(playerSpawn.x, playerSpawn.y, playerSpawn.z);
-    player->collider = Collider{0.1f, 0.1f, 0.5f};
+    player->collider = Collider{.05f, .05f, .05f};
     camera = new Camera(player->transform);
     cameraControls = new CameraControls(*camera, window);
     playerControls = new PlayerControls(player, *camera, *world);
@@ -56,6 +56,7 @@ Minecraft::Minecraft(int width, int height, int depth, int nbrTrees, glm::vec3 p
 
     auto* cube = new GameObject(MeshManager::getMesh(MeshType::BLOCK));
     cube->setTextureID(TextureManager::getTextureID(TextureType::GLOW_STONE));
+
     toRender.push_back(cube);
 
     light = new Light(
