@@ -25,7 +25,7 @@ class PlayerControls {
 public:
     PlayerControls(GameObject* transform, Camera &camera, World& world);
 
-    void processEvents(GLFWwindow* window);
+    void processEvents(GLFWwindow* window, Shader &shader);
 
     void processMouse(GLFWwindow *window);
 };

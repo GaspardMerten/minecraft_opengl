@@ -32,7 +32,7 @@ public:
 
     void render(Shader &shader);
 
-    void processEvents(GLFWwindow *window);
+    void processEvents(GLFWwindow *window, Shader &shader);
 
     void configureMatrices(Shader &shader) const;
 
