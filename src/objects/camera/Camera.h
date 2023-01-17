@@ -11,6 +11,8 @@
 
 
 class Camera {
+    bool firstPerson = false;
+
 public:
     explicit Camera(Transform &transform);
 
@@ -18,9 +20,11 @@ public:
 
     glm::mat4 getViewMatrix();
 
-    glm::mat4 getProjectionMatrix();
+    static glm::mat4 getProjectionMatrix();
 
     static float zoom;
+
+    void toggleFirstPerson();
 };
 
 

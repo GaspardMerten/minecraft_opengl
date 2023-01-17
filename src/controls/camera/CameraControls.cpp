@@ -17,3 +17,13 @@ CameraControls::CameraControls(Camera &camera, GLFWwindow *window) : camera(came
     });
 }
 
+void CameraControls::processEvents(GLFWwindow* glfWindow) {
+    if (glfwGetKey(glfWindow, GLFW_KEY_TAB) == GLFW_RELEASE && tabWasDown) {
+        std::cout << "Tab released" << std::endl;
+        camera.toggleFirstPerson();
+        tabWasDown = false;
+    } else if (glfwGetKey(glfWindow, GLFW_KEY_TAB) == GLFW_PRESS) {
+        tabWasDown = true;
+    }
+}
+

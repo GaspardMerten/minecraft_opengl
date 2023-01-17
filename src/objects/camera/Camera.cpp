@@ -9,7 +9,14 @@ Camera::Camera(Transform &transform) : transform(transform) {
 
 }
 glm::mat4 Camera::getViewMatrix()  {
-    auto model = glm::translate(transform.getModel(), glm::vec3(0, 15/zoom, 50/zoom));
+    glm::mat4 model;
+    if (firstPerson) {
+        model = glm::translate(transform.getModel(), glm::vec3(0, 2, 0.1));
+
+    } else {
+         model = glm::translate(transform.getModel(), glm::vec3(0, 15/zoom, 50/zoom));
+
+    }
     return glm::inverse(model);
 }
 
@@ -18,3 +25,7 @@ glm::mat4 Camera::getProjectionMatrix() {
 }
 
 float Camera::zoom = 1;
+
+void Camera::toggleFirstPerson() {
+    firstPerson = !firstPerson;
+}

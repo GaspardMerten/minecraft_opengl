@@ -14,8 +14,11 @@ public:
 
     explicit CameraControls(Camera &camera, GLFWwindow *window);
 
+    void processEvents(GLFWwindow* glfWindow);
 
 private:
+    bool tabWasDown = false;
+
     Camera &camera;
     GLFWwindow *window;
 };
