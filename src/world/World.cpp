@@ -9,6 +9,8 @@
 
 #include <utility>
 
+const int FIELD_OF_VIEW = 100;
+
 World::World(std::map<std::tuple<int, int, int>, std::tuple<int, MeshType, TextureType>> map, int length, int width,
              int depth) {
     worldBlocks = std::move(map);
@@ -46,7 +48,7 @@ void World::makeObjects(Shader &shader) {
 
 void World::draw(Shader &shader, glm::vec3 playerPosition) {
     for (auto &worldBlockInstance: worldBlockInstances) {
-        if (glm::distance(playerPosition, worldBlockInstance.second->transform.getPosition()) < 100) {
+        if (glm::distance(playerPosition, worldBlockInstance.second->transform.getPosition()) < FIELD_OF_VIEW) {
             worldBlockInstance.second->draw(shader);
         }
     }
@@ -195,7 +197,6 @@ glm::vec3 World::rayCastingBlockPos(glm::vec3 playerPos, glm::vec3 playerRot) {
     }*/
 
     // print rayCastingBlockPos
-    std::cout << "RayCastingBlockPos: " << rayCastingBlockPos.x << " " << rayCastingBlockPos.z << " " << rayCastingBlockPos.y << std::endl;
     // get the lowest block
     return (rayCastingBlockPos);
 
@@ -208,7 +209,6 @@ glm::vec3 World::rayCastingGetLowestBlock(glm::vec3 playerPos, glm::vec3 playerR
     int i = 0;
     while(worldBlockInstances.count(std::make_tuple(groundPos.x, groundPos.z, groundPos.y)) != 1  && i < 10) {
         // print this positing : block fpound at
-        std::cout << "Block not found at " << groundPos.x << " " << groundPos.z << " " << groundPos.y << std::endl;
         // while there is a block, go down
         groundPos.y -= 1;
         i++;

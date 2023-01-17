@@ -191,7 +191,7 @@ int main() {
     setupMeshs();
     setupTextures();
 
-    auto *minecraft = new Minecraft(100, 100, 1, 100, 5, glm::vec3(15, 1, 15), window);
+    auto *minecraft = new Minecraft(100, 100, 1, 50, 2, glm::vec3(15, 1, 15), window);
 
 
     Shader shadowShader = loadShader("shadow.vert.glsl", "shadow.frag.glsl", false, false);

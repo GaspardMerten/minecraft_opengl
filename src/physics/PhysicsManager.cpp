@@ -17,10 +17,6 @@ void PhysicsManager::update() {
 
 
 
-        if (blockAt != nullptr &&   blockAt->textureID == TextureManager::getTextureID(TextureType::WATER)) {
-            std::cout << blockAt->transform.position.x << " " << blockAt->transform.position.y << " " << blockAt->transform.position.z << std::endl;
-            std::cout << data->transform.position.x << " " << data->transform.position.y << " " << data->transform.position.z << std::endl;
-        }
 
         if (physicsData.velocity != 0 && blockAt != nullptr &&
             blockAt->textureID != TextureManager::getTextureID(TextureType::WATER)) {

@@ -12,8 +12,6 @@ CameraControls::CameraControls(Camera &camera, GLFWwindow *window) : camera(came
         Camera::zoom += (float) yoffset / 10;
         Camera::zoom = std::max(std::min(Camera::zoom, 10.0f), 2.0f);
 
-        //print zoom
-        std::cout << Camera::zoom << std::endl;
     });
 }
 
