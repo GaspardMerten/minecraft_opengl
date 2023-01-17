@@ -28,6 +28,8 @@ public:
     void processEvents(GLFWwindow* window, Shader &shader);
 
     void processMouse(GLFWwindow *window);
+
+    bool didClick = false;
 };
 
 
