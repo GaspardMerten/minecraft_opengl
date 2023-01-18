@@ -13,11 +13,11 @@
 
 class PhysicsManager {
     World *world;
-    std::vector<GameObject *> objects = std::vector<GameObject *>();
+    std::vector<IGameObject *> objects = std::vector<IGameObject *>();
 public:
     explicit PhysicsManager(World *world);
 
-    void linkGameObject(GameObject *gameObject);
+    void linkGameObject(IGameObject *gameObject);
 
     void update();
 };

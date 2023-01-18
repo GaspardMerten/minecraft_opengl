@@ -28,7 +28,7 @@ public:
     float  lastPosValue = 0.f;
     int rotationDirection = 1;
 
-
+    int jumpDelta = 0;
     int delta = 0;
 };
 

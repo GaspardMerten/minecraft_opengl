@@ -11,9 +11,9 @@ void PhysicsManager::update() {
         physicsData.velocity += physicsData.acceleration;
         physicsData.velocity -= physicsData.velocity * physicsData.dragCoefficient;
 
-        data->transform.translate(0, physicsData.velocity, 0);
+        data->getTransform()->translate(0, physicsData.velocity, 0);
 
-        GameObject *blockAt = world->getBlockAt(data->transform.position);
+        GameObject *blockAt = world->getBlockAt(data->getTransform()->position);
 
 
 
@@ -22,8 +22,8 @@ void PhysicsManager::update() {
             blockAt->textureID != TextureManager::getTextureID(TextureType::WATER)) {
 
 
-            data->transform.setPosition(data->transform.position.x, blockAt->transform.position.y + 1,
-                                            data->transform.position.z);
+            data->getTransform()->setPosition(data->getTransform()->position.x, blockAt->transform.position.y + 1,
+                                            data->getTransform()->position.z);
 
             physicsData.velocity = 0;
             physicsData.acceleration = 0;
@@ -35,7 +35,7 @@ void PhysicsManager::update() {
     }
 }
 
-void PhysicsManager::linkGameObject(GameObject *gameObject) {
+void PhysicsManager::linkGameObject(IGameObject *gameObject) {
     objects.push_back(gameObject);
 }
 

@@ -14,13 +14,12 @@ Minecraft::Minecraft(int width, int height, int depth, int nbrTrees, int nbCircl
     pnjManager = new PNJManager(world);
     physicsManager = new PhysicsManager(world);
 
-
-
     auto block = new Player();
     block->player->transform.position = playerSpawn;
-
     block->player->transform.markAsDirtyState();
     toRender.push_back(block);
+    physicsManager->linkGameObject(block);
+
 
     player = new GameObject(MeshManager::getMesh(MeshType::HUMAN));
     player->setTextureID(TextureManager::getTextureID(TextureType::PLAYER));

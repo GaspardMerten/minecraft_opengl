@@ -16,6 +16,12 @@ Player::Player() {
     leftLeg->transform.rotationAxis = glm::vec3(0, 1, 0);
     rightLeg->transform.rotationAxis = glm::vec3(0, 1, 0);
 
+    rightArm->transform.rotationAxis = glm::vec3(0.37, 1.305, 0);
+    rightArm->transform.rotateZ(-90);
+
+    leftArm->transform.rotationAxis = glm::vec3(-0.37, 1.305, 0);
+    leftArm->transform.rotateZ(90);
+
 
     player->setTextureID(TextureManager::getTextureID(PLAYER));
     leftArm->setTextureID(TextureManager::getTextureID(PLAYER));
@@ -41,6 +47,33 @@ void Player::draw(Shader &shader) {
 
     float newPosValue =  player->transform.getPosition().x + player->transform.getPosition().z;
 
+
+    std::cout << "newPosValue: " << physicsData.velocity << std::endl;
+    leftArm->transform.rotateZ(-physicsData.velocity*100);
+    rightArm->transform.rotateZ(physicsData.velocity*100);
+
+    if (leftArm->transform.rotation.z > 90) {
+        leftArm->transform.rotation.z = 90;
+    }
+
+    if (leftArm->transform.rotation.z < 0) {
+        leftArm->transform.rotation.z = 0;
+    }
+
+    if(rightArm->transform.rotation.z < -90) {
+        rightArm->transform.rotation.z = -90;
+    }
+
+    if (rightArm->transform.rotation.z > 0) {
+        rightArm->transform.rotation.z = 0;
+    }
+
+    if (physicsData.velocity == 0 && physicsData.acceleration == 0) {
+        leftArm->transform.rotation.z = 90;
+        leftArm->transform.markAsDirtyState();
+        rightArm->transform.rotation.z = -90;
+        rightArm->transform.markAsDirtyState();
+    }
 
 
     if (newPosValue != lastPosValue) {
