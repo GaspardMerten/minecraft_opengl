@@ -15,16 +15,15 @@ Minecraft::Minecraft(int width, int height, int depth, int nbrTrees, int nbCircl
     physicsManager = new PhysicsManager(world);
 
     auto block = new Player();
+    player = block;
     block->player->transform.position = playerSpawn;
     block->player->transform.markAsDirtyState();
+    block->collider = Collider{0.5f, 0.5f, 1.0f};
+
     toRender.push_back(block);
     physicsManager->linkGameObject(block);
 
 
-    player = new GameObject(MeshManager::getMesh(MeshType::HUMAN));
-    player->setTextureID(TextureManager::getTextureID(TextureType::PLAYER));
-    player->transform.setPosition(playerSpawn.x, playerSpawn.y, playerSpawn.z);
-    player->collider = Collider{0.2f, 0.2f, 1.0f};
     camera = new Camera(block->player->transform);
     cameraControls = new CameraControls(*camera, window);
     playerControls = new PlayerControls(block, *camera, *world);
@@ -75,7 +74,6 @@ Minecraft::Minecraft(int width, int height, int depth, int nbrTrees, int nbCircl
             1.0
     );
 
-    physicsManager->linkGameObject(player);
 
 }
 
@@ -87,7 +85,7 @@ void Minecraft::render(Shader &shader) {
         light->use(shader);
     }
 
-    world->draw(shader, player->transform.getPosition());
+    world->draw(shader, player->getTransform()->getPosition());
     player->draw(shader);
 
     for (auto &gameObject : toRender) {

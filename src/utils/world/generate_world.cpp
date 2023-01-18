@@ -57,7 +57,7 @@ World *generateFlatWorld(int length, int width, int depth, int nbrTrees, int nbC
         waterCenterX = rand() % (length - 20) + 10;
         waterCenterZ = rand() % (width - 20) + 10;
 
-        int waterRadius = rand() % 5 + 5;
+        int waterRadius = rand() % 20 + 5;
 
         for (int i = 0; i < length; i++) {
             for (int j = 0; j < width; j++) {

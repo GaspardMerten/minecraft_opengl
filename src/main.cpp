@@ -191,7 +191,7 @@ int main() {
     setupMeshs();
     setupTextures();
 
-    auto *minecraft = new Minecraft(100, 100, 1, 50, 2, glm::vec3(15, 1, 15), window);
+    auto *minecraft = new Minecraft(100, 100, 1, 300, 2, glm::vec3(15, 1, 15), window);
 
 
     Shader shadowShader = loadShader("shadow.vert.glsl", "shadow.frag.glsl", false, false);
@@ -241,7 +241,7 @@ int main() {
         // process opengl events
         minecraft->processEvents(window, shader);
 
-        glm::vec4 computed = lightSpaceMatrix*minecraft->player->transform.getModel()*glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+        glm::vec4 computed = lightSpaceMatrix*minecraft->player->getTransform()->getModel()*glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
         minecraft->updateManagers();
 

@@ -40,7 +40,7 @@ public:
 
     Camera *camera;
     Light *light;
-    GameObject *player;
+    IGameObject *player;
     std::vector<IGameObject*> toRender = std::vector<IGameObject*>();
     World *world;
 };

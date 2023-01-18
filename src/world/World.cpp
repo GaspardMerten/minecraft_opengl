@@ -73,16 +73,12 @@ GameObject *World::getBlockAt(glm::vec3 &vec) {
 }
 
 bool World::collides(IGameObject *object) {
-    glm::vec3 position = object->getTransform()->position;
+    glm::vec3 position = object->getTransform()->position + glm::vec3(0.5f, 0, 0.5f);
 
     glm::vec3 corner = glm::vec3(object->collider.length / 2,
                                  0,
                                  object->collider.width / 2);
 
-    // rotate the corner according to object's rotation
-    glm::mat4 rot = glm::rotate(glm::mat4(1), glm::radians(object->getTransform()->rotation.y), glm::vec3(.0f, 1.0f, 0.0f));
-
-    glm::vec3 rotatedCorner = rot * glm::vec4(corner, 1.0f);
 
     std::vector<glm::vec3> collisionBox = {
             position,
@@ -90,6 +86,10 @@ bool World::collides(IGameObject *object) {
             position + glm::vec3(corner.x, 0, corner.z),
             position + glm::vec3(-corner.x, 0, corner.z),
             position + glm::vec3(corner.x, 0, -corner.z),
+            position - glm::vec3(corner.x/2, 0, corner.z),
+            position + glm::vec3(corner.x, 0, corner.z/2),
+            position + glm::vec3(-corner.x/2, 0, corner.z),
+            position + glm::vec3(corner.x, 0, -corner.z/2),
             position + glm::vec3(corner.x, 0.05, corner.z),
             position + glm::vec3(-corner.x, 0.05, corner.z),
             position + glm::vec3(corner.x, 0.05, -corner.z),

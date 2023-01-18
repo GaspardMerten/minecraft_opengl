@@ -48,7 +48,6 @@ void Player::draw(Shader &shader) {
     float newPosValue =  player->transform.getPosition().x + player->transform.getPosition().z;
 
 
-    std::cout << "newPosValue: " << physicsData.velocity << std::endl;
     leftArm->transform.rotateZ(-physicsData.velocity*100);
     rightArm->transform.rotateZ(physicsData.velocity*100);
 
@@ -77,7 +76,6 @@ void Player::draw(Shader &shader) {
 
 
     if (newPosValue != lastPosValue) {
-        std::cout << "Player moved" << std::endl;
         lastPosValue = newPosValue;
 
         if (leftLeg->transform.rotation.x > 20) {
