@@ -168,6 +168,8 @@ int main(int argc, char *argv[]) {
     MeshManager::linkMesh(MeshType::SHEEP, "resources/objects/sheep/sheep.obj");
     MeshManager::linkMesh(MeshType::VILLAGER, "resources/objects/villager.obj");
     MeshManager::linkMesh(MeshType::CUBEMAP, "resources/objects/grass.obj");
+    MeshManager::linkMesh(MeshType::HUMAN_NO_LIMB, "resources/objects/steve_body/stevy_no_limbs.obj");
+    MeshManager::linkMesh(MeshType::RARM, "resources/objects/steve_body/right_arm.obj");
 
 
     TextureManager::linkTexture(TextureType::DIRT, "resources/textures/dirt.jpg");

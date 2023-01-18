@@ -22,11 +22,6 @@ void Transform::setPosition(double x, double y) {
 
 void Transform::setRotation(double x, double y, double z) {
     markAsDirtyState();
-    if (x > 14) {
-        x = 14;
-    } else if (x < -90) {
-        x = -90;
-    }
     // print x
     this->rotation = glm::vec3(x, y, z);
 }

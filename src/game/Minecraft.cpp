@@ -12,13 +12,18 @@ Minecraft::Minecraft(int width, int height, int depth, int nbrTrees, glm::vec3 p
     world->create();
     pnjManager = new PNJManager(world);
     physicsManager = new PhysicsManager(world);
-    player = new GameObject(MeshManager::getMesh(MeshType::HUMAN));
+    player = new GameObject(MeshManager::getMesh(MeshType::HUMAN_NO_LIMB));
     player->setTextureID(TextureManager::getTextureID(TextureType::PLAYER));
     player->transform.setPosition(playerSpawn.x, playerSpawn.y, playerSpawn.z);
     player->collider = Collider{.05f, .05f, .05f};
+
+    RArm = new GameObject(MeshManager::getMesh(MeshType::RARM));
+    RArm->setTextureID(TextureManager::getTextureID(TextureType::PLAYER));
+    RArm->transform.setPosition(playerSpawn.x, playerSpawn.y, playerSpawn.z);
+
     camera = new Camera(player->transform);
     cameraControls = new CameraControls(*camera, window);
-    playerControls = new PlayerControls(player, *camera, *world);
+    playerControls = new PlayerControls(player, RArm, *camera, *world);
 
     double size = 0.6;
 
@@ -87,6 +92,7 @@ void Minecraft::render(Shader &shader) {
 
     world->draw(shader);
     player->draw(shader);
+    RArm->draw(shader);
     for (auto &gameObject : toRender) {
         gameObject->draw(shader);
     }
@@ -95,6 +101,7 @@ void Minecraft::render(Shader &shader) {
 void Minecraft::linkShader(Shader &shader) {
     world->makeObjects(shader);
     player->makeObject(shader);
+    RArm->makeObject(shader);
     for (auto &gameObject : toRender) {
         gameObject->makeObject(shader);
     }

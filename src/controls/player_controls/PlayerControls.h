@@ -14,6 +14,7 @@
 class PlayerControls {
 
     GameObject* player;
+    GameObject* RArm;
     World& world;
     Camera& camera;
 
@@ -23,7 +24,7 @@ class PlayerControls {
     double lastX = 0;
     double lastY = 0;
 public:
-    PlayerControls(GameObject* transform, Camera &camera, World& world);
+    PlayerControls(GameObject* transform, GameObject* RArm, Camera &camera, World& world);
 
     void processEvents(GLFWwindow* window, Shader &shader);
 

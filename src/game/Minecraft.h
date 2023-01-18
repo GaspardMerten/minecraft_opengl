@@ -43,6 +43,7 @@ public:
     Camera *camera;
     Light *light;
     GameObject *player;
+    GameObject *RArm;
     std::vector<GameObject*> toRender = std::vector<GameObject*>();
 };
 
