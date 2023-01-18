@@ -33,7 +33,6 @@ public:
 
     void setScale(double x, double y);
 
-
     glm::mat4 getModel();
 
     void markAsDirtyState();
@@ -50,15 +49,21 @@ public:
 
     void setRotationY(double x);
 
+    void rotateAround(double x, double y, double z, double angle);
+
     void setDirection(glm::vec3 direction);
 
-    glm::vec3 getPosition();
+    glm::vec3 getPosition() const;
 
     Transform();
 
+    Transform(Transform& transform);
+
+    Transform* parent = nullptr;
+
     glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
     glm::vec3 rotation = glm::vec3(.0f, .0f, .0f);
-
+    glm::vec3 rotationAxis = glm::vec3(.0f, .0f, .0f);
     void translatePure(float d, float d1, float d2);
 };
 

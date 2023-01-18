@@ -44,7 +44,7 @@ public:
 
     void makeObjects(Shader &shader);
 
-    bool collides(GameObject* object);
+    bool collides(IGameObject* object);
 
     GameObject *getBlockAt(glm::vec3 &vec);
 

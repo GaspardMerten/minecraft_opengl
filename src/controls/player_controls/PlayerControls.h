@@ -13,17 +13,17 @@
 
 class PlayerControls {
 
-    GameObject* player;
+    IGameObject* player;
     World& world;
     Camera& camera;
 
-    float speed = 0.5;
+    float speed = 0.2;
     float mouseSensitivity = 0.05;
 
     double lastX = 0;
     double lastY = 0;
 public:
-    PlayerControls(GameObject* transform, Camera &camera, World& world);
+    PlayerControls(IGameObject* transform, Camera &camera, World& world);
 
     void processEvents(GLFWwindow* window, Shader &shader);
 

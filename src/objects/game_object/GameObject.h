@@ -11,12 +11,15 @@
 #include "../renderer/Renderer.h"
 #include "../collider/Collider.h"
 #include "../physics/PhysicsData.h"
+#include "IGameObject.h"
 
-class GameObject {
+class GameObject : public IGameObject {
 public:
     explicit GameObject(const std::string &pathToMesh);
 
     explicit GameObject(Mesh *mesh);
+
+    GameObject(Mesh *pMesh, Transform& transform);
 
     int loadMesh(const std::string& path);
 
@@ -30,15 +33,17 @@ public:
 
     void setTextureID(GLuint textureID);
 
-    void draw(Shader& shader);
+    void draw(Shader& shader) override;
 
-    void makeObject(Shader& shader);
+    void makeObject(Shader& shader) override;
 
     void setCollider(Collider newCollider);
 
     void setPhysicsData(PhysicsData newPhysicsData);
 
-    void makeObject(Shader shader, Renderer renderer);
+    void makeObject(Shader shader, Renderer& renderer);
+
+    Transform * getTransform()  override;
 };
 
 

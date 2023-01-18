@@ -385,6 +385,11 @@ void setupMeshs() {
     MeshManager::linkMesh(VILLAGER, "resources/objects/villager.obj");
     MeshManager::linkMesh(CUBEMAP, "resources/objects/grass.obj");
     MeshManager::linkMesh(PLANE, "resources/objects/plane.obj");
+    MeshManager::linkMesh(BODY_MESH, "resources/objects/steve_body/stevy_no_limbs.obj");
+    MeshManager::linkMesh(LEFTARM_MESH, "resources/objects/steve_body/left_arm.obj");
+    MeshManager::linkMesh(RIGHTARM_MESH, "resources/objects/steve_body/right_arm.obj");
+    MeshManager::linkMesh(LEFTLEG_MESH, "resources/objects/steve_body/left_leg.obj");
+    MeshManager::linkMesh(RIGHTLEG_MESH, "resources/objects/steve_body/right_leg.obj");
 }
 
 Shader loadShader(const std::string &vertexPath, const std::string &fragmentPath, bool withTexture, bool withLight) {

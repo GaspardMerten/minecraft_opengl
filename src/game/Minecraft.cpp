@@ -6,6 +6,7 @@
 #include "../utils/world/generate_world.h"
 #include "../objects/mesh/manager/MeshManager.h"
 #include "../texture/manager/TextureManager.h"
+#include "../objects/player/Player.h"
 
 Minecraft::Minecraft(int width, int height, int depth, int nbrTrees, int nbCircles, glm::vec3 playerSpawn, GLFWwindow *window) : world(
         generateFlatWorld(width, height, depth, nbrTrees, nbCircles)) {
@@ -13,18 +14,21 @@ Minecraft::Minecraft(int width, int height, int depth, int nbrTrees, int nbCircl
     pnjManager = new PNJManager(world);
     physicsManager = new PhysicsManager(world);
 
-    auto block = new GameObject(MeshManager::getMesh(MeshType::BLOCK));
-    block->setTextureID(TextureManager::getTextureID(TextureType::DIRT));
-    block->transform.setPosition(22, 5, 20);
+
+
+    auto block = new Player();
+    block->player->transform.position = playerSpawn;
+
+    block->player->transform.markAsDirtyState();
     toRender.push_back(block);
 
     player = new GameObject(MeshManager::getMesh(MeshType::HUMAN));
     player->setTextureID(TextureManager::getTextureID(TextureType::PLAYER));
     player->transform.setPosition(playerSpawn.x, playerSpawn.y, playerSpawn.z);
     player->collider = Collider{0.2f, 0.2f, 1.0f};
-    camera = new Camera(player->transform);
+    camera = new Camera(block->player->transform);
     cameraControls = new CameraControls(*camera, window);
-    playerControls = new PlayerControls(player, *camera, *world);
+    playerControls = new PlayerControls(block, *camera, *world);
     double size = 0.6;
 
     for (int i = 0; i < 20; i++) {

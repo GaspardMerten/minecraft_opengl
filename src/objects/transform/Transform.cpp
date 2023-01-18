@@ -22,11 +22,7 @@ void Transform::setPosition(double x, double y) {
 
 void Transform::setRotation(double x, double y, double z) {
     markAsDirtyState();
-    if (x > 14) {
-        x = 14;
-    } else if (x < -90) {
-        x = -90;
-    }
+
     // print x
     this->rotation = glm::vec3(x, y, z);
 }
@@ -55,21 +51,31 @@ void Transform::translate(double x, double y, double z) {
     float cosRotY = std::cos(rotYRadian);
     float sinRotY = std::sin(rotYRadian);
 
-    x =  oldX * cosRotY + oldZ * sinRotY;
-    z = - oldX * sinRotY + oldZ * cosRotY;
+    x = oldX * cosRotY + oldZ * sinRotY;
+    z = -oldX * sinRotY + oldZ * cosRotY;
 
     setPosition(this->position.x + x, this->position.y + y, this->position.z + z);
 }
 
 glm::mat4 Transform::getModel() {
-    if (isDirty) {
+    if (isDirty || (parent != nullptr && parent->isDirty)) {
         model = glm::mat4(1.0);
+
         model = glm::translate(model, position);
-        model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+
+        model = glm::translate(model, rotationAxis);
+        model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1, 0, 0));
+        model = glm::translate(model, -rotationAxis);
+
+
         model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(.0f, 1.0f, 0.0f));
         model = glm::rotate(model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
         model = glm::scale(model, scaling);
         isDirty = false;
+    }
+
+    if ( parent != nullptr) {
+        return parent->getModel() * model;
     }
 
     return model;
@@ -100,7 +106,7 @@ void Transform::rotateX(double x) {
     setRotationX(rotation.x + x);
 }
 
-glm::vec3 Transform::getPosition() {
+glm::vec3 Transform::getPosition() const {
     return position;
 }
 
@@ -113,5 +119,13 @@ void Transform::translatePure(float d, float d1, float d2) {
 }
 
 void Transform::setDirection(glm::vec3 direction) {
-    setRotationY(180-atan2(-direction.x, direction.z)*180/M_PI);
+    setRotationY(180 - atan2(-direction.x, direction.z) * 180 / M_PI);
+}
+
+Transform::Transform(Transform &transform) {
+    parent = &transform;
+}
+
+void Transform::rotateAround(double x, double y, double z, double angle) {
+
 }

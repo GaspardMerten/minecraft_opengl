@@ -72,15 +72,15 @@ GameObject *World::getBlockAt(glm::vec3 &vec) {
     return nullptr;
 }
 
-bool World::collides(GameObject *object) {
-    glm::vec3 position = object->transform.position;
+bool World::collides(IGameObject *object) {
+    glm::vec3 position = object->getTransform()->position;
 
     glm::vec3 corner = glm::vec3(object->collider.length / 2,
                                  0,
                                  object->collider.width / 2);
 
     // rotate the corner according to object's rotation
-    glm::mat4 rot = glm::rotate(glm::mat4(1), glm::radians(object->transform.rotation.y), glm::vec3(.0f, 1.0f, 0.0f));
+    glm::mat4 rot = glm::rotate(glm::mat4(1), glm::radians(object->getTransform()->rotation.y), glm::vec3(.0f, 1.0f, 0.0f));
 
     glm::vec3 rotatedCorner = rot * glm::vec4(corner, 1.0f);
 
