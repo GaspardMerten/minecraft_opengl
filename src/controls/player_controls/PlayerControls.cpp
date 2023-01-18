@@ -104,7 +104,7 @@ void PlayerControls::processEvents(GLFWwindow *window, Shader &shader) {
                 std::cout << "endPoint: " << currentPoint.x << " " << currentPoint.y << " " << currentPoint.z << std::endl;
 
                 if (found) {
-                    world.removeBlock(currentPoint);
+                    world.addBlock(currentPoint);
                 }
             }
         }
@@ -152,7 +152,7 @@ void PlayerControls::processEvents(GLFWwindow *window, Shader &shader) {
             std::cout << "endPoint: " << currentPoint.x << " " << currentPoint.y << " " << currentPoint.z << std::endl;
 
             if (found) {
-                world.addBlock(currentPoint - direction, shader);
+                world.removeBlock(currentPoint - direction, shader);
             }
         }
     }
