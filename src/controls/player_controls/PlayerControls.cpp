@@ -104,11 +104,59 @@ void PlayerControls::processEvents(GLFWwindow *window, Shader &shader) {
                 std::cout << "endPoint: " << currentPoint.x << " " << currentPoint.y << " " << currentPoint.z << std::endl;
 
                 if (found) {
-                    world.addBlock(currentPoint - direction, shader);
+                    world.removeBlock(currentPoint);
                 }
             }
         }
     }
+
+    // check if left click
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+        didClickLeft = true;
+    }
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE && didClickLeft) {
+        didClick = false;
+        std::cout << "Player position: " << player->transform.position.x << " " << player->transform.position.y
+                  << " " << player->transform.position.z << std::endl;
+        if (camera.firstPerson) {
+
+            std::cout << "Player rotation: " << world.normalizeAngle(player->transform.rotation.y) << std::endl;
+            glm::mat4 rotationMatrixY  = glm::rotate(glm::mat4(1.0), glm::radians(180 +player->transform.rotation.y), glm::vec3(0, 1.0f, 0));
+            glm::mat4 rotationMatrixX  = glm::rotate(glm::mat4(1.0), glm::radians(-camera.firstPersonRotation), glm::vec3(1.0f, 0, 0));
+
+
+            glm::vec3 direction4 = glm::vec3( rotationMatrixY*rotationMatrixX * glm::vec4(0, 0, 1, 1));
+            direction4 = glm::normalize(direction4);
+            const int STEP_PER_UNIT = 10;
+            direction4 =  (1.f / (float) STEP_PER_UNIT) * direction4;
+
+            glm::vec3  direction = glm::vec3(direction4.x, direction4.y, direction4.z);
+
+            glm::vec3 currentPoint = player->transform.position + glm::vec3(0, camera.firstPersonDelta.y, 0);
+
+            bool  found = false;
+
+            std::cout << "Direction: " << direction.x << " " << direction.y << " " << direction.z << std::endl;
+            std::cout << "startPoint: " << currentPoint.x << " " << currentPoint.y << " " << currentPoint.z << std::endl;
+
+
+            for (int i = 0; i < 10*STEP_PER_UNIT; i++) {
+                currentPoint = currentPoint + direction;
+                if (world.getBlockAt(currentPoint) != nullptr) {
+                    found = true;
+                    std::cout << "Block found at " << currentPoint.x << " " << currentPoint.y << " " << currentPoint.z << std::endl;
+                    break;
+                }
+            }
+
+            std::cout << "endPoint: " << currentPoint.x << " " << currentPoint.y << " " << currentPoint.z << std::endl;
+
+            if (found) {
+                world.addBlock(currentPoint - direction, shader);
+            }
+        }
+    }
+
 
     // rotate if pressing left alt
     if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS) {

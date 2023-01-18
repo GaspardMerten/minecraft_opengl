@@ -30,6 +30,7 @@ public:
     void processMouse(GLFWwindow *window);
 
     bool didClick = false;
+    bool didClickLeft = false;
 };
 
 
